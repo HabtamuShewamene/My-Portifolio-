@@ -27,13 +27,13 @@ export default function FloatingField({
         onChange={onChange}
         onBlur={onBlur}
         required={required}
-        className={`peer w-full rounded-xl border bg-slate-950/55 px-4 pb-3 pt-6 text-sm text-slate-100 outline-none transition focus:border-primary focus:ring-1 focus:ring-primary ${
-          error ? 'border-rose-500/80' : 'border-slate-700'
+        className={`theme-input peer w-full rounded-xl border px-4 pb-3 pt-6 text-sm outline-none transition ${
+          error ? 'border-rose-500/80' : ''
         }`}
       />
       <motion.span
         className={`pointer-events-none absolute left-4 text-xs ${
-          error ? 'text-rose-300' : 'text-slate-400'
+          error ? 'text-rose-300' : 'theme-text-soft'
         }`}
         animate={
           isActive

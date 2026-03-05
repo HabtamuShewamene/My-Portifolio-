@@ -18,12 +18,12 @@ export default function Hero() {
   };
 
   return (
-    <section className="relative overflow-hidden rounded-[2rem] border border-slate-700/40 bg-slate-950/70 p-6 shadow-soft backdrop-blur-xl sm:p-10">
+    <section className="theme-surface relative overflow-hidden rounded-[2rem] p-6 sm:p-10">
       <HeroBackground />
       <div className="relative z-[1] flex flex-col gap-10 md:flex-row md:items-center">
         <div className="flex-1 space-y-6">
           <motion.p
-            className="text-sm font-medium uppercase tracking-[0.25em] text-primary"
+            className="theme-text-accent text-sm font-medium uppercase tracking-[0.25em]"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
@@ -32,7 +32,7 @@ export default function Hero() {
           </motion.p>
 
           <motion.h1
-            className="font-heading text-3xl font-semibold text-slate-50 sm:text-4xl lg:text-5xl"
+            className="theme-text-primary font-heading text-3xl font-semibold sm:text-4xl lg:text-5xl"
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.05 }}
@@ -42,14 +42,14 @@ export default function Hero() {
               Habtamu Shewamene
             </span>
             <br />
-            <span className="inline-flex min-h-8 items-center text-xl font-normal text-slate-300 sm:text-2xl">
+            <span className="theme-text-muted inline-flex min-h-8 items-center text-xl font-normal sm:text-2xl">
               {role}
               <span className="ml-1 h-6 w-[2px] animate-pulse bg-primary/80" />
             </span>
           </motion.h1>
 
           <motion.p
-            className="max-w-xl text-sm leading-relaxed text-slate-300 sm:text-base"
+            className="theme-text-muted max-w-xl text-sm leading-relaxed sm:text-base"
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
@@ -67,29 +67,29 @@ export default function Hero() {
           >
             <MagneticButton
               onClick={() => scrollTo('projects')}
-              className="interactive inline-flex items-center justify-center rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-slate-950 shadow-lg shadow-sky-500/30 transition hover:bg-sky-400"
+              className="theme-button-primary interactive inline-flex items-center justify-center rounded-full px-6 py-2.5 text-sm font-semibold transition"
             >
               View Projects
             </MagneticButton>
             <MagneticButton
               onClick={() => scrollTo('contact')}
-              className="interactive inline-flex items-center justify-center rounded-full border border-slate-600 bg-slate-900 px-6 py-2.5 text-sm font-semibold text-slate-100 transition hover:border-primary hover:text-primary"
+              className="theme-button-secondary interactive inline-flex items-center justify-center rounded-full px-6 py-2.5 text-sm font-semibold transition"
             >
               Contact Me
             </MagneticButton>
           </motion.div>
 
           <motion.div
-            className="mt-2 flex flex-wrap gap-3 text-xs text-slate-400"
+            className="theme-text-soft mt-2 flex flex-wrap gap-3 text-xs"
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <span className="inline-flex items-center rounded-full bg-slate-900/80 px-3 py-1">
+            <span className="theme-chip inline-flex items-center rounded-full px-3 py-1">
               <span className="mr-1.5 h-1.5 w-1.5 rounded-full bg-emerald-400" />
               Open to junior opportunities
             </span>
-            <span className="inline-flex items-center rounded-full bg-slate-900/80 px-3 py-1">
+            <span className="theme-chip inline-flex items-center rounded-full px-3 py-1">
               Full Stack - React - Node - Java
             </span>
           </motion.div>
@@ -102,22 +102,22 @@ export default function Hero() {
           transition={{ duration: 0.6, delay: 0.15 }}
         >
           <motion.div
-            className="group relative h-56 w-56 overflow-hidden rounded-3xl border border-slate-600/70 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 shadow-soft sm:h-72 sm:w-72"
+            className="theme-surface group relative h-56 w-56 overflow-hidden rounded-3xl sm:h-72 sm:w-72"
             whileHover={reducedMotion ? undefined : { scale: 1.04, rotate: -2, rotateY: 9 }}
             transition={{ duration: 0.4, ease: 'easeOut' }}
             style={{ transformStyle: 'preserve-3d' }}
           >
             <motion.div
-              className="absolute inset-0 bg-gradient-to-tr from-primary/30 via-transparent to-secondary/50"
+              className="absolute inset-0 bg-gradient-to-tr from-[var(--accent-soft)] via-transparent to-violet-500/40"
               whileHover={reducedMotion ? undefined : { scale: 1.12, rotate: 4 }}
               transition={{ duration: 0.5 }}
             />
             <div className="relative flex h-full flex-col items-center justify-center">
-              <div className="mb-4 h-24 w-24 rounded-full border border-slate-700/70 bg-slate-900/80 ring-2 ring-primary/70" />
-              <p className="font-heading text-base font-semibold text-slate-50">
+              <div className="mb-4 h-24 w-24 rounded-full border border-[var(--theme-border)] bg-[color:var(--theme-surface)] ring-2 ring-[var(--accent-soft)]" />
+              <p className="theme-text-primary font-heading text-base font-semibold">
                 Habtamu Shewamene
               </p>
-              <p className="text-xs text-slate-400">{role || 'Full Stack Developer'}</p>
+              <p className="theme-text-soft text-xs">{role || 'Full Stack Developer'}</p>
             </div>
             <motion.div
               className="absolute -bottom-8 -left-8 h-24 w-24 rounded-full bg-sky-500/30 blur-2xl"
