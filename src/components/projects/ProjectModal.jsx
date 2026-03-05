@@ -17,7 +17,7 @@ export default function ProjectModal({ project, onClose }) {
 
   return (
     <motion.div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-slate-950/70 px-3 py-4 sm:items-center sm:px-4"
+      className="theme-modal-backdrop fixed inset-0 z-50 flex items-end justify-center px-3 py-4 sm:items-center sm:px-4"
       variants={backdropVariants}
       initial="hidden"
       animate="visible"
@@ -25,7 +25,7 @@ export default function ProjectModal({ project, onClose }) {
       onClick={onClose}
     >
       <motion.div
-        className="glass-panel relative max-h-[80vh] w-full max-w-2xl overflow-y-auto rounded-3xl border border-slate-700/70 bg-slate-950/90 p-5 text-sm text-slate-100 shadow-2xl"
+        className="theme-surface relative max-h-[80vh] w-full max-w-2xl overflow-y-auto rounded-3xl p-5 text-sm"
         variants={modalVariants}
         transition={{ type: 'spring', stiffness: 260, damping: 22 }}
         onClick={(event) => event.stopPropagation()}
@@ -36,19 +36,19 @@ export default function ProjectModal({ project, onClose }) {
         <button
           type="button"
           onClick={onClose}
-          className="absolute right-4 top-4 rounded-full bg-slate-800/80 px-2 py-1 text-xs text-slate-200 hover:bg-slate-700"
+          className="theme-button-secondary absolute right-4 top-4 rounded-full px-2 py-1 text-xs"
         >
           Close
         </button>
 
         <div className="mb-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-primary">
+          <p className="theme-text-accent text-xs font-semibold uppercase tracking-wide">
             Case Study
           </p>
-          <h3 className="font-heading text-xl font-semibold text-slate-50">
+          <h3 className="theme-text-primary font-heading text-xl font-semibold">
             {project.title}
           </h3>
-          <p className="mt-2 text-xs text-slate-300 sm:text-sm">
+          <p className="theme-text-muted mt-2 text-xs sm:text-sm">
             {project.description}
           </p>
         </div>
@@ -57,7 +57,7 @@ export default function ProjectModal({ project, onClose }) {
           {project.techStack?.map((tech) => (
             <span
               key={tech}
-              className="rounded-full bg-slate-900/90 px-3 py-1 text-[11px] font-medium text-slate-100"
+              className="theme-chip rounded-full px-3 py-1 text-[11px] font-medium"
             >
               {tech}
             </span>
@@ -66,10 +66,10 @@ export default function ProjectModal({ project, onClose }) {
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <h4 className="font-heading text-xs font-semibold uppercase tracking-wide text-slate-400">
+            <h4 className="theme-text-soft font-heading text-xs font-semibold uppercase tracking-wide">
               Key Features
             </h4>
-            <ul className="mt-2 list-disc space-y-1 pl-4 text-xs text-slate-200 sm:text-sm">
+            <ul className="theme-text-muted mt-2 list-disc space-y-1 pl-4 text-xs sm:text-sm">
               {(project.features || []).map((item) => (
                 <li key={item}>{item}</li>
               ))}
@@ -77,10 +77,10 @@ export default function ProjectModal({ project, onClose }) {
           </div>
 
           <div>
-            <h4 className="font-heading text-xs font-semibold uppercase tracking-wide text-slate-400">
+            <h4 className="theme-text-soft font-heading text-xs font-semibold uppercase tracking-wide">
               Challenges Solved
             </h4>
-            <ul className="mt-2 list-disc space-y-1 pl-4 text-xs text-slate-200 sm:text-sm">
+            <ul className="theme-text-muted mt-2 list-disc space-y-1 pl-4 text-xs sm:text-sm">
               {(project.challenges || []).map((item) => (
                 <li key={item}>{item}</li>
               ))}
@@ -93,7 +93,7 @@ export default function ProjectModal({ project, onClose }) {
             href={project.github}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center justify-center rounded-full bg-slate-900/90 px-4 py-2 text-slate-100 hover:bg-slate-800"
+            className="theme-button-secondary inline-flex items-center justify-center rounded-full px-4 py-2"
           >
             View GitHub
           </a>
@@ -101,7 +101,7 @@ export default function ProjectModal({ project, onClose }) {
             href={project.demo || '#'}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center justify-center rounded-full bg-primary px-4 py-2 text-slate-950 hover:bg-sky-400"
+            className="theme-button-primary inline-flex items-center justify-center rounded-full px-4 py-2"
           >
             Live Demo
           </a>

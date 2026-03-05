@@ -29,17 +29,17 @@ export default function Timeline() {
   return (
     <div className="space-y-8">
       <div>
-        <h2 className="font-heading text-2xl font-semibold text-slate-50 sm:text-3xl">
-          Experience and <span className="text-primary">Learning Path</span>
+        <h2 className="theme-text-primary font-heading text-2xl font-semibold sm:text-3xl">
+          Experience and <span className="theme-text-accent">Learning Path</span>
         </h2>
-        <p className="mt-2 max-w-xl text-sm text-slate-300">
+        <p className="theme-text-muted mt-2 max-w-xl text-sm">
           A timeline of how I&apos;ve been growing as a developer, focusing on fundamentals first,
           then applying them to real projects.
         </p>
       </div>
 
       <div className="relative">
-        <div className="absolute bottom-2 left-4 top-2 w-px bg-slate-700/60 sm:left-1/2" />
+        <div className="absolute bottom-2 left-4 top-2 w-px bg-[var(--theme-border)] sm:left-1/2" />
 
         <div className="space-y-6">
           {steps.map((step, index) => {
@@ -71,10 +71,10 @@ export default function Timeline() {
                   <p className="text-xs font-semibold uppercase tracking-wide text-primary">
                     {step.period}
                   </p>
-                  <h3 className="mt-1 font-heading text-sm font-semibold text-slate-50 sm:text-base">
+                  <h3 className="theme-text-primary mt-1 font-heading text-sm font-semibold sm:text-base">
                     {step.title}
                   </h3>
-                  <p className="mt-2 text-xs text-slate-300 sm:text-sm">{step.description}</p>
+                  <p className="theme-text-muted mt-2 text-xs sm:text-sm">{step.description}</p>
                 </div>
               </motion.div>
             );
