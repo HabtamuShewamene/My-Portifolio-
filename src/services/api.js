@@ -6,7 +6,9 @@ const api = axios.create({
 
 export async function fetchProjects() {
   const { data } = await api.get('/projects');
-  return data;
+  if (Array.isArray(data)) return data;
+  if (Array.isArray(data?.data)) return data.data;
+  return [];
 }
 
 export async function sendContactMessage(payload) {
