@@ -57,9 +57,9 @@ function SkillChip({ skill }) {
       animate={
         reducedMotion
           ? undefined
-          : { x: offset.x, y: offset.y, rotate: offset.x * 0.2, y: [0, -2, 0] }
+          : { x: offset.x, y: offset.y, rotate: offset.x * 0.2 }
       }
-      transition={{ duration: 2.6, repeat: Infinity, repeatType: 'mirror' }}
+      transition={{ type: 'spring', stiffness: 220, damping: 20 }}
       style={{ willChange: 'transform' }}
     >
       <div className="flex items-center gap-3">

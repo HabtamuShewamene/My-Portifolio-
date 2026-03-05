@@ -7,7 +7,7 @@ const steps = [
     description: 'Started with core programming concepts using C++ and Java.',
   },
   {
-    title: 'Data Structures & Algorithms',
+    title: 'Data Structures and Algorithms',
     period: 'Step 2',
     description: 'Implemented queues, stacks, linked lists, and more in real exercises.',
   },
@@ -30,16 +30,16 @@ export default function Timeline() {
     <div className="space-y-8">
       <div>
         <h2 className="font-heading text-2xl font-semibold text-slate-50 sm:text-3xl">
-          Experience & <span className="text-primary">Learning Path</span>
+          Experience and <span className="text-primary">Learning Path</span>
         </h2>
         <p className="mt-2 max-w-xl text-sm text-slate-300">
-          A timeline of how I&apos;ve been growing as a developer – focusing on fundamentals first,
+          A timeline of how I&apos;ve been growing as a developer, focusing on fundamentals first,
           then applying them to real projects.
         </p>
       </div>
 
       <div className="relative">
-        <div className="absolute left-4 top-2 bottom-2 w-px bg-slate-700/60 sm:left-1/2" />
+        <div className="absolute bottom-2 left-4 top-2 w-px bg-slate-700/60 sm:left-1/2" />
 
         <div className="space-y-6">
           {steps.map((step, index) => {
@@ -55,7 +55,9 @@ export default function Timeline() {
               >
                 <div
                   className={`mt-2 hidden h-3 w-3 rounded-full bg-primary ring-4 ring-sky-500/30 sm:block ${
-                    isLeft ? 'sm:order-1 sm:ml-[calc(50%-0.375rem)]' : 'sm:order-2 sm:ml-[calc(50%-0.375rem)]'
+                    isLeft
+                      ? 'sm:order-1 sm:ml-[calc(50%-0.375rem)]'
+                      : 'sm:order-2 sm:ml-[calc(50%-0.375rem)]'
                   }`}
                 />
 
@@ -82,4 +84,3 @@ export default function Timeline() {
     </div>
   );
 }
-
