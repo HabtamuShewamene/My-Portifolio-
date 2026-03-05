@@ -1,0 +1,238 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Sora:wght@500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --theme-background: radial-gradient(circle at top right, #0a1929, #0f172a);
+  --theme-surface: rgba(30, 41, 59, 0.7);
+  --theme-shadow: 0 24px 50px rgba(2, 6, 23, 0.45);
+  --theme-text: #f8fafc;
+  --theme-text-muted: rgba(248, 250, 252, 0.76);
+  --theme-text-soft: rgba(248, 250, 252, 0.58);
+  --theme-border: rgba(255, 255, 255, 0.1);
+  --theme-backdrop: rgba(2, 6, 23, 0.72);
+  --accent-color: #3b82f6;
+  --accent-glow: rgba(59, 130, 246, 0.52);
+  --accent-soft: rgba(59, 130, 246, 0.2);
+  --accent-strong: rgba(59, 130, 246, 0.9);
+}
+
+html[data-theme='light'] {
+  --theme-background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+  --theme-surface: rgba(255, 255, 255, 0.92);
+  --theme-shadow: 0 18px 40px rgba(15, 23, 42, 0.11);
+  --theme-text: #0f172a;
+  --theme-text-muted: rgba(15, 23, 42, 0.78);
+  --theme-text-soft: rgba(15, 23, 42, 0.58);
+  --theme-border: rgba(0, 0, 0, 0.1);
+  --theme-backdrop: rgba(15, 23, 42, 0.38);
+}
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    margin: 0;
+    color: var(--theme-text);
+    background: var(--theme-background);
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+    transition: background 0.4s ease, color 0.4s ease;
+  }
+
+  @media (min-width: 768px) {
+    body {
+      cursor: none;
+    }
+  }
+
+  #root {
+    min-height: 100vh;
+  }
+}
+
+.theme-page {
+  background: var(--theme-background);
+  color: var(--theme-text);
+}
+
+.theme-text-primary {
+  color: var(--theme-text);
+}
+
+.theme-text-muted {
+  color: var(--theme-text-muted);
+}
+
+.theme-text-soft {
+  color: var(--theme-text-soft);
+}
+
+.theme-text-accent {
+  color: var(--accent-color);
+}
+
+.theme-navbar {
+  border-color: var(--theme-border);
+  background: color-mix(in oklab, var(--theme-surface) 84%, transparent);
+}
+
+.theme-surface,
+.glass-panel {
+  background: var(--theme-surface);
+  border: 1px solid var(--theme-border);
+  box-shadow: var(--theme-shadow);
+  backdrop-filter: blur(18px);
+  transition: background 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+}
+
+.theme-section-alt {
+  background: color-mix(in oklab, var(--theme-surface) 55%, transparent);
+}
+
+.theme-chip {
+  color: var(--theme-text-muted);
+  border-color: var(--theme-border);
+  background: color-mix(in oklab, var(--theme-surface) 76%, transparent);
+}
+
+.theme-chip-active {
+  color: #f8fafc;
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--accent-color), #8b5cf6);
+  box-shadow: 0 0 20px var(--accent-glow);
+}
+
+.theme-icon-btn,
+.theme-toggle {
+  border-color: var(--theme-border);
+  background: color-mix(in oklab, var(--theme-surface) 82%, transparent);
+  color: var(--theme-text);
+}
+
+.theme-button-primary {
+  color: #f8fafc;
+  border: none;
+  background: linear-gradient(135deg, var(--accent-color), #8b5cf6);
+  box-shadow: 0 0 18px var(--accent-glow);
+}
+
+.theme-button-secondary {
+  color: var(--theme-text);
+  border: 1px solid var(--theme-border);
+  background: color-mix(in oklab, var(--theme-surface) 75%, transparent);
+}
+
+.theme-input {
+  color: var(--theme-text);
+  border-color: var(--theme-border);
+  background: color-mix(in oklab, var(--theme-surface) 85%, transparent);
+}
+
+.theme-input:focus {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 1px var(--accent-color);
+}
+
+.theme-modal-backdrop {
+  background: var(--theme-backdrop);
+  backdrop-filter: blur(9px);
+}
+
+.theme-orb-primary {
+  background: radial-gradient(circle, color-mix(in oklab, var(--accent-color) 28%, transparent), transparent 65%);
+}
+
+.theme-orb-secondary {
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.2), transparent 65%);
+}
+
+.section-container {
+  @apply mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8;
+}
+
+.section-padding {
+  @apply py-16 sm:py-20 lg:py-24;
+}
+
+.gradient-mesh {
+  background: radial-gradient(circle at 15% 20%, rgba(10, 25, 41, 0.96) 0%, transparent 50%),
+    radial-gradient(circle at 82% 16%, rgba(59, 130, 246, 0.55) 0%, transparent 48%),
+    radial-gradient(circle at 68% 84%, rgba(139, 92, 246, 0.4) 0%, transparent 52%),
+    radial-gradient(circle at 35% 72%, rgba(59, 130, 246, 0.24) 0%, transparent 40%),
+    linear-gradient(120deg, #0a1929, #3b82f6, #8b5cf6);
+  background-size: 160% 160%;
+}
+
+.skeleton-shimmer {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(
+    120deg,
+    color-mix(in oklab, var(--theme-surface) 58%, #0f172a),
+    color-mix(in oklab, var(--theme-surface) 76%, #64748b),
+    color-mix(in oklab, var(--theme-surface) 58%, #0f172a)
+  );
+}
+
+.skeleton-shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  animation: shimmer 1.3s infinite;
+}
+
+.custom-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  background: linear-gradient(140deg, var(--accent-color), #8b5cf6);
+  box-shadow: 0 0 16px var(--accent-glow);
+  z-index: 70;
+  pointer-events: none;
+}
+
+.custom-cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: 999px;
+  border: 1px solid var(--accent-soft);
+  z-index: 69;
+  pointer-events: none;
+}
+
+@keyframes shimmer {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition-duration: 0.01ms !important;
+  }
+}

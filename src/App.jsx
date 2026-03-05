@@ -47,18 +47,18 @@ function HomePage() {
 
   return (
     <motion.div
-      className="relative min-h-screen overflow-hidden bg-gradient-to-b from-slate-50 via-light to-slate-100 text-slate-900 transition-colors duration-500 dark:bg-gradient-to-b dark:from-slate-950 dark:via-dark dark:to-slate-950 dark:text-slate-100"
+      className="theme-page relative min-h-screen overflow-hidden transition-colors duration-500"
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -12 }}
       transition={{ duration: 0.45 }}
     >
       <motion.div
-        className="pointer-events-none absolute -left-32 top-10 h-64 w-64 rounded-full bg-primary/20 blur-3xl dark:bg-primary/30"
+        className="theme-orb-primary pointer-events-none absolute -left-32 top-10 h-64 w-64 rounded-full blur-3xl"
         style={{ y: parallaxY }}
       />
       <motion.div
-        className="pointer-events-none absolute -right-24 bottom-0 h-72 w-72 rounded-full bg-secondary/15 blur-3xl dark:bg-secondary/25"
+        className="theme-orb-secondary pointer-events-none absolute -right-24 bottom-0 h-72 w-72 rounded-full blur-3xl"
         style={{ y: parallaxY }}
       />
 
@@ -70,7 +70,7 @@ function HomePage() {
           </div>
         </section>
 
-        <RevealSection id="about" className="bg-slate-900/40">
+        <RevealSection id="about" className="theme-section-alt">
           <Suspense fallback={<SectionSkeleton />}>
             <About />
           </Suspense>
@@ -82,7 +82,7 @@ function HomePage() {
           </Suspense>
         </RevealSection>
 
-        <RevealSection id="skills" className="bg-slate-900/40">
+        <RevealSection id="skills" className="theme-section-alt">
           <Suspense fallback={<SectionSkeleton />}>
             <Skills />
           </Suspense>
@@ -94,7 +94,7 @@ function HomePage() {
           </Suspense>
         </RevealSection>
 
-        <RevealSection id="contact" className="bg-slate-900/40">
+        <RevealSection id="contact" className="theme-section-alt">
           <Suspense fallback={<SectionSkeleton />}>
             <ContactForm />
           </Suspense>
