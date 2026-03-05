@@ -44,7 +44,7 @@ function SkillChip({ skill }) {
 
   return (
     <motion.div
-      className="interactive rounded-xl border border-slate-700/70 bg-slate-900/80 p-3"
+      className="theme-surface interactive rounded-xl p-3"
       onMouseMove={(event) => {
         if (reducedMotion) return;
         const rect = event.currentTarget.getBoundingClientRect();
@@ -64,19 +64,21 @@ function SkillChip({ skill }) {
     >
       <div className="flex items-center gap-3">
         <motion.div
-          className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-sky-400/30 to-violet-400/30 text-xs font-semibold text-slate-100"
+          className="flex h-9 w-9 items-center justify-center rounded-lg text-xs font-semibold text-slate-100"
+          style={{ background: 'linear-gradient(140deg, var(--accent-soft), rgba(139, 92, 246, 0.35))' }}
           whileHover={reducedMotion ? undefined : { scale: 1.08, rotate: 4 }}
         >
           {skill.icon}
         </motion.div>
         <div className="min-w-0 flex-1">
-          <div className="flex items-center justify-between text-xs text-slate-200">
+          <div className="theme-text-muted flex items-center justify-between text-xs">
             <span className="truncate">{skill.name}</span>
-            <span className="text-slate-400">{skill.level}%</span>
+            <span className="theme-text-soft">{skill.level}%</span>
           </div>
-          <div className="mt-1 h-1.5 w-full rounded-full bg-slate-800">
+          <div className="mt-1 h-1.5 w-full rounded-full bg-[color:var(--theme-border)]">
             <motion.div
-              className="h-1.5 rounded-full bg-gradient-to-r from-primary to-secondary"
+              className="h-1.5 rounded-full"
+              style={{ background: 'linear-gradient(to right, var(--accent-color), #8b5cf6)' }}
               initial={{ width: 0 }}
               whileInView={{ width: `${skill.level}%` }}
               viewport={{ once: true }}
@@ -93,10 +95,10 @@ export default function Skills() {
   return (
     <div className="space-y-8">
       <div>
-        <h2 className="font-heading text-2xl font-semibold text-slate-50 sm:text-3xl">
-          Technical <span className="text-primary">Skills</span>
+        <h2 className="theme-text-primary font-heading text-2xl font-semibold sm:text-3xl">
+          Technical <span className="theme-text-accent">Skills</span>
         </h2>
-        <p className="mt-2 max-w-xl text-sm text-slate-300">
+        <p className="theme-text-muted mt-2 max-w-xl text-sm">
           A snapshot of the technologies I work with most often. Levels represent relative comfort
           and experience, and I&apos;m always improving.
         </p>
@@ -112,7 +114,7 @@ export default function Skills() {
             viewport={{ once: true }}
             transition={{ duration: 0.4, delay: groupIndex * 0.06 }}
           >
-            <h3 className="font-heading text-sm font-semibold text-slate-50 sm:text-base">
+            <h3 className="theme-text-primary font-heading text-sm font-semibold sm:text-base">
               {group.label}
             </h3>
             <div className="mt-3 grid gap-3">
