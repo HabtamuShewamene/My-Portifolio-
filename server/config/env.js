@@ -36,6 +36,10 @@ export const env = {
   port: parseInt(process.env.PORT) || 5000,
   nodeEnv: process.env.NODE_ENV || 'development',
   clientOrigin: process.env.CLIENT_ORIGIN || 'http://localhost:5173',
+  clientOrigins: (process.env.CLIENT_ORIGIN || 'http://localhost:5173')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean),
   trustProxy: process.env.TRUST_PROXY === 'true',
 
   // Email Configuration
