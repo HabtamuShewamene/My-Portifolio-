@@ -49,15 +49,48 @@ html[data-theme='light'] {
     transition: background 0.4s ease, color 0.4s ease;
   }
 
-  @media (min-width: 768px) {
-    body {
-      cursor: none;
-    }
-  }
-
   #root {
     min-height: 100vh;
   }
+}
+
+/* Reset all custom cursor styles */
+* {
+  cursor: auto !important;
+}
+
+/* Restore proper cursor for interactive elements */
+a,
+button,
+input,
+textarea,
+select,
+[role='button'],
+[type='submit'],
+[type='button'] {
+  cursor: pointer !important;
+}
+
+/* Text cursor for inputs */
+input[type='text'],
+input[type='email'],
+input[type='password'],
+textarea {
+  cursor: text !important;
+}
+
+/* Default cursor for everything else */
+body,
+div,
+section,
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  cursor: auto !important;
 }
 
 .theme-page {
@@ -203,31 +236,6 @@ html[data-theme='light'] {
   transform: translateX(-100%);
   background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
   animation: shimmer 1.3s infinite;
-}
-
-.custom-cursor {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 20px;
-  height: 20px;
-  border-radius: 999px;
-  background: linear-gradient(140deg, var(--accent-color), #8b5cf6);
-  box-shadow: 0 0 16px var(--accent-glow);
-  z-index: 70;
-  pointer-events: none;
-}
-
-.custom-cursor-ring {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 48px;
-  height: 48px;
-  border-radius: 999px;
-  border: 1px solid var(--accent-soft);
-  z-index: 69;
-  pointer-events: none;
 }
 
 @keyframes shimmer {

@@ -4,7 +4,6 @@ import { AnimatePresence, motion } from 'framer-motion';
 import Navbar from './components/navbar/Navbar.jsx';
 import Hero from './components/hero/Hero.jsx';
 import Footer from './components/footer/Footer.jsx';
-import CustomCursor from './components/ui/CustomCursor.jsx';
 import ShimmerSkeleton from './components/ui/ShimmerSkeleton.jsx';
 import ChatErrorBoundary from './components/ai/ChatErrorBoundary.jsx';
 import { useSectionReveal } from './hooks/useSectionReveal.js';
@@ -15,7 +14,7 @@ const ProjectGrid = lazy(() => import('./components/projects/ProjectGrid.jsx'));
 const Skills = lazy(() => import('./components/skills/Skills.jsx'));
 const Timeline = lazy(() => import('./components/experience/Timeline.jsx'));
 const ContactForm = lazy(() => import('./components/contact/ContactForm.jsx'));
-const ChatBot = lazy(() => import('./components/ai/ChatBot.jsx'));
+const ChatAssistant = lazy(() => import('./components/ai/ChatAssistant.jsx'));
 
 function SectionSkeleton() {
   return (
@@ -104,11 +103,10 @@ function HomePage() {
 
       <ChatErrorBoundary>
         <Suspense fallback={null}>
-          <ChatBot />
+          <ChatAssistant />
         </Suspense>
       </ChatErrorBoundary>
       <Footer />
-      <CustomCursor />
     </motion.div>
   );
 }

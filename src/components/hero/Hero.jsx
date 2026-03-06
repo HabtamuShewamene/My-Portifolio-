@@ -112,12 +112,15 @@ export default function Hero() {
               whileHover={reducedMotion ? undefined : { scale: 1.12, rotate: 4 }}
               transition={{ duration: 0.5 }}
             />
-            <div className="relative flex h-full flex-col items-center justify-center">
-              <div className="mb-4 h-24 w-24 rounded-full border border-[var(--theme-border)] bg-[color:var(--theme-surface)] ring-2 ring-[var(--accent-soft)]" />
-              <p className="theme-text-primary font-heading text-base font-semibold">
-                Habtamu Shewamene
-              </p>
-              <p className="theme-text-soft text-xs">{role || 'Full Stack Developer'}</p>
+            <img
+              src="/profile-photo.jpg"
+              alt="Habtamu Shewamene profile photo"
+              className="relative h-full w-full object-cover object-center"
+              loading="eager"
+            />
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-900/60 to-transparent p-4">
+              <p className="font-heading text-sm font-semibold text-white">Habtamu Shewamene</p>
+              <p className="text-xs text-slate-200">{role || 'Full Stack Developer'}</p>
             </div>
             <motion.div
               className="absolute -bottom-8 -left-8 h-24 w-24 rounded-full bg-sky-500/30 blur-2xl"
