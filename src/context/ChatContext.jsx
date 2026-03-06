@@ -1,5 +1,6 @@
-import { createContext, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { quickActionPrompts } from '../data/assistantKnowledge.js';
+import { ChatContext } from './chatContextObject.js';
 import {
   createAssistantMemory,
   createInitialAssistantMessage,
@@ -16,8 +17,6 @@ const STORAGE_KEYS = {
 
 const RATE_LIMIT_MS = 900;
 const RESPONSE_DEBOUNCE_MS = 220;
-
-export const ChatContext = createContext(null);
 
 function safeParse(raw, fallback) {
   try {
@@ -234,4 +233,3 @@ export function ChatProvider({ children }) {
 
   return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;
 }
-
