@@ -1,12 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useTheme } from '../../hooks/useTheme.js';
-import {
-  createAssistantMemory,
-  createInitialAssistantMessage,
-  generateAssistantReply,
-  updateMemory,
-} from '../../services/assistantEngine.js';
+import { chatData } from '../../data/chatData.js';
 import ChatMessage from './ChatMessage.jsx';
 import ChatInput from './ChatInput.jsx';
 import TypingIndicator from './TypingIndicator.jsx';
@@ -43,6 +38,212 @@ function writeStorage(key, value) {
   }
 }
 
+function normalize(value) {
+  return value.toLowerCase().trim();
+}
+
+function hasAny(text, keywords) {
+  return keywords.some((word) => text.includes(word));
+}
+
+function formatProjectList(projects) {
+  return projects.map((project) => `- ${project.name} (${project.stack.join(', ')})`).join('\n');
+}
+
+function formatProjectDetails(project) {
+  return (
+    `${project.name}\n` +
+    `${project.summary}\n` +
+    `Tech: ${project.stack.join(', ')}\n` +
+    `${project.highlights.map((item) => `- ${item}`).join('\n')}`
+  );
+}
+
+function resolveProjectByKeyword(text) {
+  const words = normalize(text);
+  return chatData.projects.find((project) => {
+    const name = project.name.toLowerCase();
+    const stack = project.stack.join(' ').toLowerCase();
+    return words.includes(project.id) || words.includes(name) || words.includes(stack);
+  });
+}
+
+function resolveProjectSuggestions(text) {
+  const normalized = normalize(text);
+
+  if (hasAny(normalized, ['java', 'spring'])) {
+    return chatData.projects.filter((project) =>
+      project.stack.some((tech) => ['java', 'spring boot'].includes(tech.toLowerCase())),
+    );
+  }
+
+  if (hasAny(normalized, ['react'])) {
+    return chatData.projects.filter((project) =>
+      project.stack.some((tech) => tech.toLowerCase().includes('react')),
+    );
+  }
+
+  if (hasAny(normalized, ['node', 'express', 'backend', 'api'])) {
+    return chatData.projects.filter((project) =>
+      project.stack.some((tech) => ['node.js', 'express'].includes(tech.toLowerCase())),
+    );
+  }
+
+  return chatData.projects;
+}
+
+function createWelcomeMessage() {
+  return {
+    id: `assistant-welcome-${Date.now()}`,
+    role: 'assistant',
+    content:
+      `Hi. I am Habtamu's portfolio assistant.\n` +
+      `You can ask about projects, skills, experience, or contact details.`,
+    ts: Date.now(),
+    intent: 'welcome',
+  };
+}
+
+function generateSmartReply(input, context) {
+  const text = normalize(input);
+  const activeProject = context.lastProjectId
+    ? chatData.projects.find((project) => project.id === context.lastProjectId)
+    : null;
+
+  if (hasAny(text, ['name', 'who are you', 'full name'])) {
+    return {
+      intent: 'name',
+      lastProjectId: context.lastProjectId,
+      content: `${chatData.profile.fullName} - ${chatData.profile.role}.`,
+    };
+  }
+
+  if (hasAny(text, ['skills', 'technologies', 'tech stack'])) {
+    return {
+      intent: 'skills',
+      lastProjectId: context.lastProjectId,
+      content:
+        `Skills and technologies:\n` +
+        `Frontend: ${chatData.skills.frontend.join(', ')}\n` +
+        `Backend: ${chatData.skills.backend.join(', ')}\n` +
+        `Database: ${chatData.skills.database.join(', ')}\n` +
+        `Tools: ${chatData.skills.tools.join(', ')}`,
+    };
+  }
+
+  if (hasAny(text, ['project', 'projects', 'portfolio'])) {
+    const suggestions = resolveProjectSuggestions(text);
+    const firstProject = suggestions[0] || chatData.projects[0];
+    return {
+      intent: 'projects',
+      lastProjectId: firstProject?.id || null,
+      content:
+        `Habtamu has built ${chatData.projects.length} strong projects:\n` +
+        `${formatProjectList(suggestions)}\n\n` +
+        `Which one interests you most?`,
+    };
+  }
+
+  if (hasAny(text, ['tell me more about that one', 'that one', 'more about it', 'tell me more'])) {
+    if (activeProject) {
+      return {
+        intent: 'project_detail',
+        lastProjectId: activeProject.id,
+        content: formatProjectDetails(activeProject),
+      };
+    }
+    return {
+      intent: 'project_detail',
+      lastProjectId: context.lastProjectId,
+      content: `Tell me which project you want details for: ${chatData.projects.map((p) => p.name).join(', ')}.`,
+    };
+  }
+
+  if (hasAny(text, ['what else', 'anything else', 'more options'])) {
+    const remaining = chatData.projects.filter((project) => project.id !== context.lastProjectId);
+    return {
+      intent: 'projects',
+      lastProjectId: remaining[0]?.id || context.lastProjectId,
+      content: `Here are more options:\n${formatProjectList(remaining.slice(0, 5))}`,
+    };
+  }
+
+  if (hasAny(text, ['contact', 'email', 'reach'])) {
+    return {
+      intent: 'contact',
+      lastProjectId: context.lastProjectId,
+      content:
+        `Email: ${chatData.profile.email}\n` +
+        `Use the contact form on this page for opportunities and collaboration requests.`,
+    };
+  }
+
+  if (hasAny(text, ['experience', 'timeline', 'background'])) {
+    return {
+      intent: 'experience',
+      lastProjectId: context.lastProjectId,
+      content:
+        `Experience timeline:\n` +
+        chatData.experience
+          .map((item) => `- ${item.period}: ${item.role}\n  ${item.details}`)
+          .join('\n'),
+    };
+  }
+
+  if (hasAny(text, ['java', 'spring'])) {
+    const jobPortal = chatData.projects.find((project) => project.id === 'job-portal');
+    return {
+      intent: 'project_detail',
+      lastProjectId: jobPortal?.id || context.lastProjectId,
+      content:
+        `For Java/Spring work, the standout project is ${jobPortal?.name}.\n` +
+        `${jobPortal ? formatProjectDetails(jobPortal) : ''}`,
+    };
+  }
+
+  if (hasAny(text, ['react'])) {
+    const reactProjects = chatData.projects.filter((project) =>
+      ['crypto-tracker', 'news-app'].includes(project.id),
+    );
+    return {
+      intent: 'projects',
+      lastProjectId: reactProjects[0]?.id || context.lastProjectId,
+      content:
+        `React-focused projects:\n${formatProjectList(reactProjects)}\n` +
+        `Crypto Tracker and News App are great to review first.`,
+    };
+  }
+
+  if (hasAny(text, ['github'])) {
+    return {
+      intent: 'github',
+      lastProjectId: context.lastProjectId,
+      content: `GitHub: ${chatData.profile.github}`,
+    };
+  }
+
+  const explicitProject = resolveProjectByKeyword(text);
+  if (explicitProject) {
+    return {
+      intent: 'project_detail',
+      lastProjectId: explicitProject.id,
+      content: formatProjectDetails(explicitProject),
+    };
+  }
+
+  return {
+    intent: 'fallback',
+    lastProjectId: context.lastProjectId,
+    content:
+      `I'm not sure about that, but I can tell you about Habtamu's:\n` +
+      `• Projects (7 full-stack applications)\n` +
+      `• Skills (React, Java, Node.js, etc.)\n` +
+      `• Experience and background\n` +
+      `• How to contact him\n\n` +
+      `What would you like to know?`,
+  };
+}
+
 export default function ChatAssistant() {
   const { isDark } = useTheme();
   const [isOpen, setIsOpen] = useState(() => readStorage(STORAGE_KEYS.open, false));
@@ -51,7 +252,7 @@ export default function ChatAssistant() {
   const [draft, setDraft] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [helperText, setHelperText] = useState('');
-  const memoryRef = useRef(createAssistantMemory());
+  const contextRef = useRef({ lastIntent: null, lastProjectId: null });
   const scrollRef = useRef(null);
   const replyTimeoutRef = useRef(null);
 
@@ -86,7 +287,7 @@ export default function ChatAssistant() {
 
     const hasWelcomed = readStorage(STORAGE_KEYS.welcomed, false);
     if (!hasWelcomed && messages.length === 0) {
-      setMessages([createInitialAssistantMessage()]);
+      setMessages([createWelcomeMessage()]);
       writeStorage(STORAGE_KEYS.welcomed, true);
     }
   }, [isOpen, messages.length]);
@@ -111,13 +312,16 @@ export default function ChatAssistant() {
 
     replyTimeoutRef.current = window.setTimeout(() => {
       try {
-        const reply = generateAssistantReply(trimmed, memoryRef.current);
-        memoryRef.current = updateMemory(memoryRef.current, reply);
+        const reply = generateSmartReply(trimmed, contextRef.current);
+        contextRef.current = {
+          lastIntent: reply.intent,
+          lastProjectId: reply.lastProjectId,
+        };
 
         const assistantMessage = {
           id: `assistant-${Date.now()}`,
           role: 'assistant',
-          content: reply.text,
+          content: reply.content,
           ts: Date.now(),
           intent: reply.intent,
         };
@@ -234,4 +438,3 @@ export default function ChatAssistant() {
     </>
   );
 }
-
