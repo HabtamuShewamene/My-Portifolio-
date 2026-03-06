@@ -4,7 +4,6 @@ import { AnimatePresence, motion } from 'framer-motion';
 import Navbar from './components/navbar/Navbar.jsx';
 import Hero from './components/hero/Hero.jsx';
 import Footer from './components/footer/Footer.jsx';
-import CustomCursor from './components/ui/CustomCursor.jsx';
 import ShimmerSkeleton from './components/ui/ShimmerSkeleton.jsx';
 import ChatErrorBoundary from './components/ai/ChatErrorBoundary.jsx';
 import { useSectionReveal } from './hooks/useSectionReveal.js';
@@ -108,7 +107,6 @@ function HomePage() {
         </Suspense>
       </ChatErrorBoundary>
       <Footer />
-      <CustomCursor />
     </motion.div>
   );
 }
