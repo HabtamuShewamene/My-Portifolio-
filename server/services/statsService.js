@@ -37,8 +37,8 @@ async function fetchGitHubRepo(username, repo) {
 
 export async function getPortfolioStats() {
   const [githubProfile, githubRepo] = await Promise.all([
-    fetchGitHubProfile(env.githubUsername),
-    fetchGitHubRepo(env.githubUsername, env.githubRepo),
+    fetchGitHubProfile(env.github.username),
+    fetchGitHubRepo(env.github.username, env.github.repo),
   ]);
 
   return {

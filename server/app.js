@@ -1,41 +1,25 @@
-// server/app.js
 import express from 'express';
-import cors from 'cors';
 import helmet from 'helmet';
-import { env } from './config/env.js';
-import contactRoutes from './routes/contactRoutes.js';
+import { corsMiddleware } from './config/cors.js';
+import apiRoutes from './routes/index.js';
+import { sanitizeInput } from './middleware/sanitizeInput.js';
+import { notFound } from './middleware/notFound.js';
+import { errorHandler } from './middleware/errorHandler.js';
 
 const app = express();
 
-// Middleware
 app.use(helmet());
-app.use(cors({
-  origin: env.clientOrigin,
-  credentials: true
-}));
+app.use(corsMiddleware);
 app.use(express.json());
+app.use(sanitizeInput);
 
-// Routes
-app.use('/api/contact', contactRoutes);
+app.use('/api', apiRoutes);
 
-// Test endpoint
 app.get('/api/test', (req, res) => {
-  res.json({ 
-    message: 'Server is running!',
-    environment: env.nodeEnv,
-    emailConfigured: env.email.configured
-  });
+  res.json({ ok: true, message: 'Server is running' });
 });
 
-// 404 handler
-app.use((req, res) => {
-  res.status(404).json({ error: 'Route not found' });
-});
-
-// Error handler
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ error: 'Something went wrong!' });
-});
+app.use(notFound);
+app.use(errorHandler);
 
 export default app;

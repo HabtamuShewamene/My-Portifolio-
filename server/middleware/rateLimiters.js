@@ -2,16 +2,16 @@ import rateLimit from 'express-rate-limit';
 import { env } from '../config/env.js';
 
 export const contactLimiter = rateLimit({
-  windowMs: env.contactRateLimitWindowMs,
-  max: env.contactRateLimitMax,
+  windowMs: env.rateLimits.contact.windowMs,
+  max: env.rateLimits.contact.max,
   message: { ok: false, message: 'Too many contact requests. Try again later.' },
   standardHeaders: true,
   legacyHeaders: false,
 });
 
 export const chatLimiter = rateLimit({
-  windowMs: env.chatRateLimitWindowMs,
-  max: env.chatRateLimitMax,
+  windowMs: env.rateLimits.chat.windowMs,
+  max: env.rateLimits.chat.max,
   message: { ok: false, message: 'Too many chat requests. Slow down and try again.' },
   standardHeaders: true,
   legacyHeaders: false,
