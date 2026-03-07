@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
+import { createPortal } from 'react-dom';
 import { fetchResumeStats } from '../../services/api.js';
 import { checkStaticResumePdf, downloadResume, openResumeEmail } from '../../services/resume.js';
 
@@ -50,6 +51,7 @@ export default function ResumeDownloadButton({
   const [panelOpen, setPanelOpen] = useState(false);
   const [hasPdf, setHasPdf] = useState(false);
   const [downloadCount, setDownloadCount] = useState(null);
+  const [panelPosition, setPanelPosition] = useState({ top: 0, left: 0 });
 
   const [format, setFormat] = useState('pdf');
   const [template, setTemplate] = useState('modern');
@@ -72,13 +74,45 @@ export default function ResumeDownloadButton({
 
   useEffect(() => {
     if (!panelOpen) return undefined;
+
+    const panelWidth = 318;
+    const spacing = 8;
+    const rect = rootRef.current?.getBoundingClientRect();
+    if (rect) {
+      const targetLeft = rect.left + rect.width - panelWidth;
+      const maxLeft = window.innerWidth - panelWidth - spacing;
+      const clampedLeft = Math.min(Math.max(targetLeft, spacing), maxLeft);
+      setPanelPosition({
+        top: rect.bottom + 10,
+        left: clampedLeft,
+      });
+    }
+
     const onClickOutside = (event) => {
       if (!rootRef.current?.contains(event.target)) {
         setPanelOpen(false);
       }
     };
+    const onWindowChange = () => {
+      const nextRect = rootRef.current?.getBoundingClientRect();
+      if (!nextRect) return;
+      const targetLeft = nextRect.left + nextRect.width - panelWidth;
+      const maxLeft = window.innerWidth - panelWidth - spacing;
+      const clampedLeft = Math.min(Math.max(targetLeft, spacing), maxLeft);
+      setPanelPosition({
+        top: nextRect.bottom + 10,
+        left: clampedLeft,
+      });
+    };
+
     window.addEventListener('mousedown', onClickOutside);
-    return () => window.removeEventListener('mousedown', onClickOutside);
+    window.addEventListener('resize', onWindowChange);
+    window.addEventListener('scroll', onWindowChange, true);
+    return () => {
+      window.removeEventListener('mousedown', onClickOutside);
+      window.removeEventListener('resize', onWindowChange);
+      window.removeEventListener('scroll', onWindowChange, true);
+    };
   }, [panelOpen]);
 
   const doDownload = async () => {
@@ -180,8 +214,11 @@ export default function ResumeDownloadButton({
         <span>{label}</span>
       </motion.button>
 
-      {panelOpen && (
-        <div className="resume-panel theme-surface absolute right-0 top-[calc(100%+10px)] z-30 w-[318px] rounded-2xl border shadow-xl">
+      {panelOpen && createPortal(
+        <div
+          className="resume-panel theme-surface fixed z-[80] w-[318px] rounded-2xl border shadow-xl"
+          style={{ top: panelPosition.top, left: panelPosition.left }}
+        >
           <div className="border-b px-4 py-3">
             <h3 className="theme-text-primary text-base font-semibold">Download Resume</h3>
           </div>
@@ -251,7 +288,8 @@ export default function ResumeDownloadButton({
               📊 Downloaded {typeof downloadCount === 'number' ? downloadCount : '--'} times
             </p>
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
     </div>
   );
