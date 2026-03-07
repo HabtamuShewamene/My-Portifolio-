@@ -9,6 +9,7 @@ class JSONStore {
     this.contactsFile = path.join(this.dataDir, 'contacts.json');
     this.chatsFile = path.join(this.dataDir, 'chats.json');
     this.visitorsFile = path.join(this.dataDir, 'visitors.json');
+    this.resumeAnalyticsFile = path.join(this.dataDir, 'resume-analytics.json');
     this.initialized = false;
   }
 
@@ -18,6 +19,12 @@ class JSONStore {
       await this.ensureFile(this.contactsFile, []);
       await this.ensureFile(this.chatsFile, []);
       await this.ensureFile(this.visitorsFile, { totalVisits: 0, visitors: {} });
+      await this.ensureFile(this.resumeAnalyticsFile, {
+        totalDownloads: 0,
+        byFormat: {},
+        byPlacement: {},
+        history: [],
+      });
       this.initialized = true;
       console.log('JSON store initialized');
     } catch (error) {
@@ -99,6 +106,64 @@ class JSONStore {
       uniqueVisitors: Object.keys(state.visitors).length,
       currentVisitor: state.visitors[safeIp],
       updatedAt: now,
+    };
+  }
+
+  async trackResumeDownload(event) {
+    const now = new Date().toISOString();
+    const state = await this.readJson(this.resumeAnalyticsFile, {
+      totalDownloads: 0,
+      byFormat: {},
+      byPlacement: {},
+      history: [],
+    });
+
+    const format = String(event?.format || 'unknown').toLowerCase();
+    const placement = String(event?.placement || 'unknown').toLowerCase();
+    const source = String(event?.source || 'unknown').toLowerCase();
+    const entry = {
+      id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      format,
+      placement,
+      source,
+      ip: event?.ipAddress || 'unknown',
+      userAgent: event?.userAgent || 'unknown',
+      ts: now,
+    };
+
+    state.totalDownloads = Number(state.totalDownloads || 0) + 1;
+    state.byFormat = state.byFormat || {};
+    state.byPlacement = state.byPlacement || {};
+    state.history = Array.isArray(state.history) ? state.history : [];
+
+    state.byFormat[format] = Number(state.byFormat[format] || 0) + 1;
+    state.byPlacement[placement] = Number(state.byPlacement[placement] || 0) + 1;
+    state.history.push(entry);
+    state.history = state.history.slice(-300);
+
+    await this.writeJson(this.resumeAnalyticsFile, state);
+
+    return {
+      totalDownloads: state.totalDownloads,
+      byFormat: state.byFormat,
+      byPlacement: state.byPlacement,
+      lastDownload: entry,
+    };
+  }
+
+  async getResumeStats() {
+    const state = await this.readJson(this.resumeAnalyticsFile, {
+      totalDownloads: 0,
+      byFormat: {},
+      byPlacement: {},
+      history: [],
+    });
+
+    return {
+      totalDownloads: Number(state.totalDownloads || 0),
+      byFormat: state.byFormat || {},
+      byPlacement: state.byPlacement || {},
+      recent: Array.isArray(state.history) ? state.history.slice(-20).reverse() : [],
     };
   }
 }

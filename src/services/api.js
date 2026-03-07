@@ -130,3 +130,20 @@ export async function fetchVisitorSnapshot() {
   const data = await request('/visitor');
   return data?.data || null;
 }
+
+export async function trackResumeDownloadEvent(payload = {}) {
+  const data = await request('/resume/track', {
+    method: 'POST',
+    data: {
+      format: String(payload.format || '').toLowerCase(),
+      placement: String(payload.placement || 'unknown').toLowerCase(),
+      source: String(payload.source || 'unknown').toLowerCase(),
+    },
+  });
+  return data?.data || null;
+}
+
+export async function fetchResumeStats() {
+  const data = await request('/resume/stats');
+  return data?.data || null;
+}

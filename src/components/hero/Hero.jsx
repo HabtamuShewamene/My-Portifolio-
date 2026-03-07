@@ -72,7 +72,7 @@ export default function Hero() {
             >
               View Projects
             </MagneticButton>
-            <ResumeDownloadButton />
+            <ResumeDownloadButton label="Get My Resume" placement="hero" />
             <MagneticButton
               onClick={() => scrollTo('contact')}
               className="theme-button-secondary interactive inline-flex items-center justify-center rounded-full px-6 py-2.5 text-sm font-semibold transition"
