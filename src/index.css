@@ -191,6 +191,25 @@ h6 {
   animation: resume-spin 0.8s linear infinite;
 }
 
+.resume-panel {
+  backdrop-filter: blur(16px);
+}
+
+.resume-dot {
+  display: inline-flex;
+  height: 14px;
+  width: 14px;
+  border-radius: 999px;
+  border: 1px solid var(--theme-border);
+  background: color-mix(in oklab, var(--theme-surface) 80%, transparent);
+}
+
+.resume-dot-active {
+  border-color: transparent;
+  background: radial-gradient(circle at center, #3b82f6 30%, #8b5cf6 100%);
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--accent-color) 25%, transparent);
+}
+
 @keyframes resume-spin {
   to {
     transform: rotate(360deg);

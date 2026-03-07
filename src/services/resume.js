@@ -56,6 +56,16 @@ function skillsSectionText() {
   ];
 }
 
+function skillsMatrixRows() {
+  return [
+    ['JavaScript', 'Advanced', 'Frontend + Backend'],
+    ['React', 'Advanced', 'Hooks, State, Routing'],
+    ['Node.js / Express', 'Intermediate', 'REST APIs, validation, security'],
+    ['Java / Spring Boot', 'Intermediate', 'Role-based backend applications'],
+    ['MySQL / MongoDB', 'Intermediate', 'Schema design and query optimization'],
+  ];
+}
+
 function projectsSectionText() {
   return [
     '1) Job Portal System (Java Full Stack) - Java, Spring Boot, MySQL, XAMPP, Thymeleaf',
@@ -123,72 +133,127 @@ function interestsSectionText() {
   ];
 }
 
-function buildResumeText() {
+function normalizeInclude(include = {}) {
+  return {
+    fullResume: include.fullResume !== false,
+    skillsMatrix: include.skillsMatrix !== false,
+    contactDetails: include.contactDetails === true,
+  };
+}
+
+function matrixAsText() {
+  const rows = skillsMatrixRows();
+  return [
+    'Skill | Level | Focus',
+    '---------------------------------------------',
+    ...rows.map((row) => `${row[0]} | ${row[1]} | ${row[2]}`),
+  ];
+}
+
+function matrixAsMarkdown() {
+  const rows = skillsMatrixRows();
+  return [
+    '| Skill | Level | Focus |',
+    '| --- | --- | --- |',
+    ...rows.map((row) => `| ${row[0]} | ${row[1]} | ${row[2]} |`),
+  ];
+}
+
+function buildResumeText(include) {
+  const options = normalizeInclude(include);
   const lines = [
     PROFILE.fullName,
     PROFILE.role,
-    `${PROFILE.location} | ${PROFILE.email} | ${PROFILE.phone}`,
-    `GitHub: ${PROFILE.github}`,
-    `LinkedIn: ${PROFILE.linkedin}`,
-    '',
-    'PROFESSIONAL SUMMARY',
-    summarySection(),
-    '',
-    'TECHNICAL SKILLS',
-    ...skillsSectionText(),
-    '',
-    'PROJECTS',
-    ...projectsSectionText(),
-    '',
-    'EXPERIENCE',
-    ...experienceSectionText(),
-    '',
-    'EDUCATION',
-    ...educationSectionText(),
-    '',
-    'LANGUAGES',
-    ...languagesSectionText(),
-    '',
-    'INTERESTS',
-    ...interestsSectionText(),
   ];
+
+  if (options.contactDetails) {
+    lines.push(`${PROFILE.location} | ${PROFILE.email} | ${PROFILE.phone}`);
+    lines.push(`GitHub: ${PROFILE.github}`);
+    lines.push(`LinkedIn: ${PROFILE.linkedin}`);
+  }
+
+  lines.push('');
+  lines.push('PROFESSIONAL SUMMARY');
+  lines.push(summarySection());
+
+  if (options.skillsMatrix) {
+    lines.push('');
+    lines.push('SKILLS MATRIX');
+    lines.push(...matrixAsText());
+  }
+
+  if (options.fullResume) {
+    lines.push('');
+    lines.push('TECHNICAL SKILLS');
+    lines.push(...skillsSectionText());
+    lines.push('');
+    lines.push('PROJECTS');
+    lines.push(...projectsSectionText());
+    lines.push('');
+    lines.push('EXPERIENCE');
+    lines.push(...experienceSectionText());
+    lines.push('');
+    lines.push('EDUCATION');
+    lines.push(...educationSectionText());
+    lines.push('');
+    lines.push('LANGUAGES');
+    lines.push(...languagesSectionText());
+    lines.push('');
+    lines.push('INTERESTS');
+    lines.push(...interestsSectionText());
+  }
 
   return lines.join('\n');
 }
 
-function buildResumeMarkdown() {
-  return [
+function buildResumeMarkdown(include) {
+  const options = normalizeInclude(include);
+  const lines = [
     `# ${PROFILE.fullName}`,
     `**${PROFILE.role}**`,
     '',
-    `- Location: ${PROFILE.location}`,
-    `- Email: ${PROFILE.email}`,
-    `- Phone: ${PROFILE.phone}`,
-    `- GitHub: ${PROFILE.github}`,
-    `- LinkedIn: ${PROFILE.linkedin}`,
-    '',
-    '## Professional Summary',
-    summarySection(),
-    '',
-    '## Technical Skills',
-    ...skillsSectionText().map((line) => `- ${line}`),
-    '',
-    '## Projects',
-    ...projectsSectionText().map((line) => `- ${line}`),
-    '',
-    '## Experience',
-    ...experienceSectionText().map((line) => `- ${line}`),
-    '',
-    '## Education',
-    ...educationSectionText().map((line) => `- ${line}`),
-    '',
-    '## Languages',
-    ...languagesSectionText().map((line) => `- ${line}`),
-    '',
-    '## Interests',
-    ...interestsSectionText().map((line) => `- ${line}`),
-    '',
-  ].join('\n');
+  ];
+
+  if (options.contactDetails) {
+    lines.push(`- Location: ${PROFILE.location}`);
+    lines.push(`- Email: ${PROFILE.email}`);
+    lines.push(`- Phone: ${PROFILE.phone}`);
+    lines.push(`- GitHub: ${PROFILE.github}`);
+    lines.push(`- LinkedIn: ${PROFILE.linkedin}`);
+    lines.push('');
+  }
+
+  lines.push('## Professional Summary');
+  lines.push(summarySection());
+  lines.push('');
+
+  if (options.skillsMatrix) {
+    lines.push('## Skills Matrix');
+    lines.push(...matrixAsMarkdown());
+    lines.push('');
+  }
+
+  if (options.fullResume) {
+    lines.push('## Technical Skills');
+    lines.push(...skillsSectionText().map((line) => `- ${line}`));
+    lines.push('');
+    lines.push('## Projects');
+    lines.push(...projectsSectionText().map((line) => `- ${line}`));
+    lines.push('');
+    lines.push('## Experience');
+    lines.push(...experienceSectionText().map((line) => `- ${line}`));
+    lines.push('');
+    lines.push('## Education');
+    lines.push(...educationSectionText().map((line) => `- ${line}`));
+    lines.push('');
+    lines.push('## Languages');
+    lines.push(...languagesSectionText().map((line) => `- ${line}`));
+    lines.push('');
+    lines.push('## Interests');
+    lines.push(...interestsSectionText().map((line) => `- ${line}`));
+  }
+
+  return lines.join('\n');
 }
 
 function escapeHtml(value) {
@@ -198,46 +263,80 @@ function escapeHtml(value) {
     .replaceAll('>', '&gt;');
 }
 
-function buildResumeDocHtml() {
+function buildResumeDocHtml(template = 'modern', include) {
+  const options = normalizeInclude(include);
+  const isModern = template === 'modern';
+  const styles = isModern
+    ? `
+      body { font-family: 'Segoe UI', Arial, sans-serif; margin: 26px; color: #0f172a; line-height: 1.45; }
+      h1 { margin: 0 0 4px; font-size: 30px; color: #1d4ed8; }
+      h2 { margin-top: 20px; margin-bottom: 8px; font-size: 17px; border-left: 4px solid #8b5cf6; padding-left: 8px; }
+      p, li, td, th { font-size: 11.5pt; }
+      table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+      th, td { border: 1px solid #dbeafe; padding: 6px 8px; text-align: left; }
+      th { background: #eff6ff; }`
+    : `
+      body { font-family: Calibri, Arial, sans-serif; margin: 28px; color: #111827; line-height: 1.45; }
+      h1 { margin: 0 0 6px; font-size: 28px; }
+      h2 { margin-top: 20px; margin-bottom: 8px; font-size: 18px; border-bottom: 1px solid #e5e7eb; padding-bottom: 4px; }
+      p, li, td, th { font-size: 12pt; }
+      table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+      th, td { border: 1px solid #e5e7eb; padding: 6px 8px; text-align: left; }`;
+
+  const contactHtml = options.contactDetails
+    ? `<p>${escapeHtml(`${PROFILE.location} | ${PROFILE.email} | ${PROFILE.phone}`)}</p>
+       <p>GitHub: ${escapeHtml(PROFILE.github)}<br/>LinkedIn: ${escapeHtml(PROFILE.linkedin)}</p>`
+    : '';
+
+  const matrixHtml = options.skillsMatrix
+    ? `
+      <h2>Skills Matrix</h2>
+      <table>
+        <thead><tr><th>Skill</th><th>Level</th><th>Focus</th></tr></thead>
+        <tbody>
+          ${skillsMatrixRows().map((row) => `<tr><td>${escapeHtml(row[0])}</td><td>${escapeHtml(row[1])}</td><td>${escapeHtml(row[2])}</td></tr>`).join('')}
+        </tbody>
+      </table>`
+    : '';
+
+  const fullResumeHtml = options.fullResume
+    ? `
+      <h2>Technical Skills</h2>
+      <ul>${skillsSectionText().map((line) => `<li>${escapeHtml(line)}</li>`).join('')}</ul>
+
+      <h2>Projects</h2>
+      <ul>${projectsSectionText().map((line) => `<li>${escapeHtml(line)}</li>`).join('')}</ul>
+
+      <h2>Experience</h2>
+      <ul>${experienceSectionText().map((line) => `<li>${escapeHtml(line)}</li>`).join('')}</ul>
+
+      <h2>Education</h2>
+      <ul>${educationSectionText().map((line) => `<li>${escapeHtml(line)}</li>`).join('')}</ul>
+
+      <h2>Languages</h2>
+      <ul>${languagesSectionText().map((line) => `<li>${escapeHtml(line)}</li>`).join('')}</ul>
+
+      <h2>Interests</h2>
+      <ul>${interestsSectionText().map((line) => `<li>${escapeHtml(line)}</li>`).join('')}</ul>`
+    : '';
+
   return `
 <html>
 <head>
   <meta charset="utf-8" />
   <title>${PROFILE.fullName} Resume</title>
-  <style>
-    body { font-family: Calibri, Arial, sans-serif; margin: 28px; color: #111827; line-height: 1.45; }
-    h1 { margin: 0 0 6px; font-size: 28px; }
-    h2 { margin-top: 20px; margin-bottom: 8px; font-size: 18px; border-bottom: 1px solid #e5e7eb; padding-bottom: 4px; }
-    p, li { font-size: 12pt; }
-    ul { margin-top: 4px; }
-  </style>
+  <style>${styles}</style>
 </head>
 <body>
   <h1>${escapeHtml(PROFILE.fullName)}</h1>
   <p><strong>${escapeHtml(PROFILE.role)}</strong></p>
-  <p>${escapeHtml(`${PROFILE.location} | ${PROFILE.email} | ${PROFILE.phone}`)}</p>
-  <p>GitHub: ${escapeHtml(PROFILE.github)}<br/>LinkedIn: ${escapeHtml(PROFILE.linkedin)}</p>
+  ${contactHtml}
 
   <h2>Professional Summary</h2>
   <p>${escapeHtml(summarySection())}</p>
 
-  <h2>Technical Skills</h2>
-  <ul>${skillsSectionText().map((line) => `<li>${escapeHtml(line)}</li>`).join('')}</ul>
-
-  <h2>Projects</h2>
-  <ul>${projectsSectionText().map((line) => `<li>${escapeHtml(line)}</li>`).join('')}</ul>
-
-  <h2>Experience</h2>
-  <ul>${experienceSectionText().map((line) => `<li>${escapeHtml(line)}</li>`).join('')}</ul>
-
-  <h2>Education</h2>
-  <ul>${educationSectionText().map((line) => `<li>${escapeHtml(line)}</li>`).join('')}</ul>
-
-  <h2>Languages</h2>
-  <ul>${languagesSectionText().map((line) => `<li>${escapeHtml(line)}</li>`).join('')}</ul>
-
-  <h2>Interests</h2>
-  <ul>${interestsSectionText().map((line) => `<li>${escapeHtml(line)}</li>`).join('')}</ul>
+  ${matrixHtml}
+  ${fullResumeHtml}
 </body>
 </html>`.trim();
 }
@@ -257,50 +356,87 @@ export async function checkStaticResumePdf() {
   return hasStaticPdf();
 }
 
-export function getSupportedResumeFormats() {
-  return [...SUPPORTED_FORMATS];
+export function openResumeEmail(options = {}) {
+  const format = String(options.format || 'pdf').toUpperCase();
+  const template = String(options.template || 'modern');
+  const include = normalizeInclude(options.include);
+  const params = new URLSearchParams({
+    subject: 'Resume Request - Habtamu Shewamene',
+    body:
+      `Hi Habtamu,\n\n` +
+      `I downloaded your resume from the portfolio and wanted to connect.\n\n` +
+      `Selection:\n` +
+      `- Format: ${format}\n` +
+      `- Template: ${template}\n` +
+      `- Full Resume: ${include.fullResume ? 'Yes' : 'No'}\n` +
+      `- Skills Matrix: ${include.skillsMatrix ? 'Yes' : 'No'}\n` +
+      `- Contact Details Included: ${include.contactDetails ? 'Yes' : 'No'}\n\n` +
+      `Best regards,`,
+  });
+
+  window.location.href = `mailto:${PROFILE.email}?${params.toString()}`;
 }
 
-export async function downloadResume({ format = 'pdf', placement = 'unknown' } = {}) {
+export async function downloadResume({
+  format = 'pdf',
+  placement = 'unknown',
+  template = 'modern',
+  include = {},
+  source = 'panel',
+} = {}) {
   const normalizedFormat = String(format || 'pdf').toLowerCase();
   if (!SUPPORTED_FORMATS.includes(normalizedFormat)) {
     throw new Error('Unsupported resume format.');
   }
 
+  const includeOptions = normalizeInclude(include);
   await wait(420);
 
-  let source = 'generated';
   let trackedFormat = normalizedFormat;
+  let trackedSource = source;
 
   if (normalizedFormat === 'pdf') {
     const available = await hasStaticPdf();
-    if (available) {
-      source = 'static';
+    if (available && includeOptions.fullResume && includeOptions.skillsMatrix) {
+      trackedSource = 'static';
       triggerDownloadFromUrl(STATIC_RESUME_PDF, `${BASE_FILENAME}.pdf`);
     } else {
       trackedFormat = 'doc';
-      triggerBlobDownload(buildResumeDocHtml(), 'application/msword', `${BASE_FILENAME}.doc`);
+      triggerBlobDownload(
+        buildResumeDocHtml(template, includeOptions),
+        'application/msword',
+        `${BASE_FILENAME}.docx`,
+      );
     }
   } else if (normalizedFormat === 'doc') {
-    triggerBlobDownload(buildResumeDocHtml(), 'application/msword', `${BASE_FILENAME}.doc`);
+    triggerBlobDownload(
+      buildResumeDocHtml(template, includeOptions),
+      'application/msword',
+      `${BASE_FILENAME}.docx`,
+    );
   } else if (normalizedFormat === 'txt') {
-    triggerBlobDownload(buildResumeText(), 'text/plain;charset=utf-8', `${BASE_FILENAME}.txt`);
+    triggerBlobDownload(
+      buildResumeText(includeOptions),
+      'text/plain;charset=utf-8',
+      `${BASE_FILENAME}.txt`,
+    );
   } else if (normalizedFormat === 'md') {
-    triggerBlobDownload(buildResumeMarkdown(), 'text/markdown;charset=utf-8', `${BASE_FILENAME}.md`);
+    triggerBlobDownload(
+      buildResumeMarkdown(includeOptions),
+      'text/markdown;charset=utf-8',
+      `${BASE_FILENAME}.md`,
+    );
   }
 
   try {
     await trackResumeDownloadEvent({
       format: trackedFormat,
       placement,
-      source,
+      source: `${trackedSource}:${template}`,
     });
   } catch {
     // Non-blocking analytics call.
   }
 
-  return {
-    format: trackedFormat,
-    source,
-  };
+  return { format: trackedFormat };
 }
