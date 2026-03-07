@@ -10,6 +10,7 @@ const app = express();
 
 app.use(helmet());
 app.use(corsMiddleware);
+app.options('*', corsMiddleware);
 app.use(express.json());
 app.use(sanitizeInput);
 
