@@ -41,6 +41,7 @@ export default function ProjectCard({
   const reducedMotion = useReducedMotion();
   const { tilt, onMouseMove, onMouseLeave } = useTilt(9);
   const snippetPreview = project.codeSnippets?.[0]?.code || '';
+  const hasLiveDemo = Boolean(project.demo && project.demo.startsWith('http') && !project.demo.includes('example.com'));
 
   const handleClick = () => {
     if (onOpen) onOpen(project);
@@ -160,13 +161,16 @@ export default function ProjectCard({
             GitHub
           </a>
           <a
-            href={project.demo || '#'}
+            href={hasLiveDemo ? project.demo : '#'}
             target="_blank"
             rel="noreferrer"
-            className="theme-button-primary interactive inline-flex flex-1 items-center justify-center rounded-full px-3 py-1.5 transition"
-            onClick={(event) => event.stopPropagation()}
+            className={`theme-button-primary interactive inline-flex flex-1 items-center justify-center rounded-full px-3 py-1.5 transition ${hasLiveDemo ? '' : 'pointer-events-none opacity-60'}`}
+            onClick={(event) => {
+              event.stopPropagation();
+              if (!hasLiveDemo) event.preventDefault();
+            }}
           >
-            Demo
+            {hasLiveDemo ? 'Demo' : 'No Demo'}
           </a>
           <button
             type="button"

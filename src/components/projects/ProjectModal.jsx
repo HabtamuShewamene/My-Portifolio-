@@ -65,7 +65,8 @@ export default function ProjectModal({ project, onClose, onTechExplore, onShare 
 
   const snippets = project.codeSnippets || [];
   const activeSnippet = snippets[snippetIndex];
-  const canEmbedDemo = project.demo?.startsWith('http');
+  const hasLiveDemo = Boolean(project.demo?.startsWith('http') && !project.demo.includes('example.com'));
+  const canEmbedDemo = hasLiveDemo;
 
   return (
     <motion.div
@@ -198,12 +199,15 @@ export default function ProjectModal({ project, onClose, onTechExplore, onShare 
             View GitHub
           </a>
           <a
-            href={project.demo || '#'}
+            href={hasLiveDemo ? project.demo : '#'}
             target="_blank"
             rel="noreferrer"
-            className="theme-button-primary inline-flex items-center justify-center rounded-full px-4 py-2"
+            className={`theme-button-primary inline-flex items-center justify-center rounded-full px-4 py-2 ${hasLiveDemo ? '' : 'pointer-events-none opacity-60'}`}
+            onClick={(event) => {
+              if (!hasLiveDemo) event.preventDefault();
+            }}
           >
-            Live Demo
+            {hasLiveDemo ? 'Live Demo' : 'No Live Demo'}
           </a>
           <button
             type="button"

@@ -2,11 +2,25 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { sendContactMessage } from '../../services/api.js';
 
-function extractApiError(error) {
-  const payload = error?.response?.data;
-  if (!payload) return 'Unable to reach server. Make sure backend is running.';
-  if (Array.isArray(payload.errors) && payload.errors.length) return payload.errors[0];
-  return payload.message || payload.error || 'Something went wrong. Please try again.';
+function validateForm({ name, email, message, consent }) {
+  if (!name.trim() || !email.trim() || !message.trim()) {
+    return 'Please fill in all fields.';
+  }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email.trim())) {
+    return 'Please enter a valid email address.';
+  }
+
+  if (message.trim().length < 10) {
+    return 'Message must be at least 10 characters.';
+  }
+
+  if (!consent) {
+    return 'Please provide GDPR consent.';
+  }
+
+  return null;
 }
 
 export default function ContactForm() {
@@ -17,7 +31,11 @@ export default function ContactForm() {
     consent: false,
     website: '',
   });
-  const [status, setStatus] = useState({ loading: false, success: false, error: '' });
+  const [status, setStatus] = useState({
+    submitting: false,
+    success: false,
+    error: '',
+  });
 
   const handleChange = (event) => {
     const { name, value, type, checked } = event.target;
@@ -27,28 +45,30 @@ export default function ContactForm() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    if (!formData.name || !formData.email || !formData.message) {
-      setStatus({ loading: false, success: false, error: 'Please fill in all fields.' });
-      return;
-    }
-    if (!formData.consent) {
-      setStatus({ loading: false, success: false, error: 'Please provide GDPR consent.' });
+
+    const validationError = validateForm(formData);
+    if (validationError) {
+      setStatus({ submitting: false, success: false, error: validationError });
       return;
     }
 
-    setStatus({ loading: true, success: false, error: '' });
+    setStatus({ submitting: true, success: false, error: '' });
+
     try {
       await sendContactMessage(formData);
-      setStatus({ loading: false, success: true, error: '' });
+
+      setStatus({ submitting: false, success: true, error: '' });
       setFormData({ name: '', email: '', message: '', consent: false, website: '' });
+
       window.setTimeout(() => {
-        setStatus({ loading: false, success: false, error: '' });
-      }, 4500);
+        setStatus({ submitting: false, success: false, error: '' });
+      }, 5000);
     } catch (error) {
+      console.error('Submission error:', error);
       setStatus({
-        loading: false,
+        submitting: false,
         success: false,
-        error: extractApiError(error),
+        error: error?.message || 'Network error. Please check browser console for details.',
       });
     }
   };
@@ -78,9 +98,10 @@ export default function ContactForm() {
               name="name"
               value={formData.name}
               onChange={handleChange}
+              required
               className="theme-input w-full rounded-lg border px-4 py-3 text-sm"
               placeholder="Your name"
-              disabled={status.loading}
+              disabled={status.submitting}
             />
           </div>
 
@@ -91,9 +112,10 @@ export default function ContactForm() {
               name="email"
               value={formData.email}
               onChange={handleChange}
+              required
               className="theme-input w-full rounded-lg border px-4 py-3 text-sm"
               placeholder="you@example.com"
-              disabled={status.loading}
+              disabled={status.submitting}
             />
           </div>
 
@@ -104,9 +126,10 @@ export default function ContactForm() {
               value={formData.message}
               onChange={handleChange}
               rows={5}
+              required
               className="theme-input w-full resize-none rounded-lg border px-4 py-3 text-sm"
               placeholder="Tell me about your project..."
-              disabled={status.loading}
+              disabled={status.submitting}
             />
           </div>
 
@@ -117,7 +140,7 @@ export default function ContactForm() {
               checked={formData.consent}
               onChange={handleChange}
               className="mt-0.5"
-              disabled={status.loading}
+              disabled={status.submitting}
             />
             <span>I consent to processing my message and contact details for this request.</span>
           </label>
@@ -149,18 +172,18 @@ export default function ContactForm() {
               animate={{ opacity: 1, y: 0 }}
               className="rounded-lg bg-emerald-500/10 p-3 text-sm text-emerald-400"
             >
-              Message sent successfully. I&apos;ll get back to you soon.
+              Message sent successfully.
             </motion.div>
           )}
 
           <button
             type="submit"
-            disabled={status.loading}
+            disabled={status.submitting}
             className={`theme-button-primary w-full rounded-lg px-6 py-3 text-sm font-semibold ${
-              status.loading ? 'cursor-not-allowed opacity-60' : ''
+              status.submitting ? 'cursor-not-allowed opacity-60' : ''
             }`}
           >
-            {status.loading ? 'Sending...' : 'Send Message'}
+            {status.submitting ? 'Sending...' : 'Send Message'}
           </button>
         </motion.form>
       </div>

@@ -1,39 +1,38 @@
-// server/config/env.js
 import dotenv from 'dotenv';
+import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import fs from 'fs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Look for .env in the server folder first (where we know it exists)
-const serverEnvPath = path.join(__dirname, '../.env');
-const rootEnvPath = path.join(__dirname, '../../.env');
+const serverRoot = path.resolve(__dirname, '..');
+const projectRoot = path.resolve(serverRoot, '..');
+const serverEnvPath = path.join(serverRoot, '.env');
+const rootEnvPath = path.join(projectRoot, '.env');
 
-console.log('🔍 Looking for .env files:');
-console.log(`   Server .env: ${serverEnvPath} (${fs.existsSync(serverEnvPath) ? '✅' : '❌'})`);
-console.log(`   Root .env: ${rootEnvPath} (${fs.existsSync(rootEnvPath) ? '✅' : '❌'})`);
-
-// Load from server folder first
 if (fs.existsSync(serverEnvPath)) {
-  console.log('📁 Loading .env from server folder');
   dotenv.config({ path: serverEnvPath });
 } else if (fs.existsSync(rootEnvPath)) {
-  console.log('📁 Loading .env from root folder');
   dotenv.config({ path: rootEnvPath });
 } else {
-  console.warn('⚠️  No .env file found!');
+  console.warn('No .env file found.');
 }
 
-// Debug: Check what was loaded
-console.log('📧 After loading:');
-console.log('   CONTACT_EMAIL_USER:', process.env.CONTACT_EMAIL_USER ? '✅ Found' : '❌ Missing');
-console.log('   CONTACT_EMAIL_PASS:', process.env.CONTACT_EMAIL_PASS ? '✅ Found' : '❌ Missing');
+function resolveRuntimePath(rawPath, fallbackRelativeToServer) {
+  const value = String(rawPath || '').trim();
+  if (!value) return path.resolve(serverRoot, fallbackRelativeToServer);
+  if (path.isAbsolute(value)) return value;
+
+  // Accept legacy values like "server/data" as project-root-relative.
+  if (/^server[\\/]/i.test(value)) {
+    return path.resolve(projectRoot, value);
+  }
+  return path.resolve(serverRoot, value);
+}
 
 export const env = {
-  // Server
-  port: parseInt(process.env.PORT) || 5000,
+  port: Number.parseInt(process.env.PORT || '5000', 10) || 5000,
   nodeEnv: process.env.NODE_ENV || 'development',
   clientOrigin: process.env.CLIENT_ORIGIN || 'http://localhost:5173',
   clientOrigins: (process.env.CLIENT_ORIGIN || 'http://localhost:5173')
@@ -42,37 +41,33 @@ export const env = {
     .filter(Boolean),
   trustProxy: process.env.TRUST_PROXY === 'true',
 
-  // Email Configuration
   email: {
     user: process.env.CONTACT_EMAIL_USER,
     pass: process.env.CONTACT_EMAIL_PASS,
     to: process.env.CONTACT_EMAIL_TO || process.env.CONTACT_EMAIL_USER,
     get configured() {
-      return !!(this.user && this.pass);
-    }
+      return Boolean(this.user && this.pass);
+    },
   },
 
-  // Rate Limiting
   rateLimits: {
     contact: {
-      max: parseInt(process.env.CONTACT_RATE_LIMIT_MAX) || 5,
-      windowMs: parseInt(process.env.CONTACT_RATE_LIMIT_WINDOW_MS) || 3600000
+      max: Number.parseInt(process.env.CONTACT_RATE_LIMIT_MAX || '5', 10) || 5,
+      windowMs: Number.parseInt(process.env.CONTACT_RATE_LIMIT_WINDOW_MS || '3600000', 10) || 3600000,
     },
     chat: {
-      max: parseInt(process.env.CHAT_RATE_LIMIT_MAX) || 40,
-      windowMs: parseInt(process.env.CHAT_RATE_LIMIT_WINDOW_MS) || 900000
-    }
+      max: Number.parseInt(process.env.CHAT_RATE_LIMIT_MAX || '40', 10) || 40,
+      windowMs: Number.parseInt(process.env.CHAT_RATE_LIMIT_WINDOW_MS || '900000', 10) || 900000,
+    },
   },
 
-  // Social & GitHub
   github: {
     username: process.env.GITHUB_USERNAME || 'habtamu-shewamene',
-    repo: process.env.GITHUB_REPO || 'my-portfolio'
+    repo: process.env.GITHUB_REPO || 'my-portfolio',
   },
-  
-  linkedinFollowers: process.env.LINKEDIN_FOLLOWERS || '500',
 
-  // Paths
-  dataDir: process.env.DATA_DIR || path.join(__dirname, '../data'),
-  backupDir: process.env.BACKUP_DIR || path.join(__dirname, '../backups'),
+  linkedinFollowers: process.env.LINKEDIN_FOLLOWERS || '500',
+  dataDir: resolveRuntimePath(process.env.DATA_DIR, 'data'),
+  backupDir: resolveRuntimePath(process.env.BACKUP_DIR, 'backups'),
 };
+

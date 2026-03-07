@@ -27,7 +27,7 @@ export const assistantProfile = {
       'Available for junior full-stack developer opportunities, internships, and project collaborations.',
   },
   links: {
-    github: 'https://github.com/your-username',
+    github: 'https://github.com/HATAG-TECH',
     portfolio: 'https://example.com',
   },
 };
@@ -76,7 +76,7 @@ export const projectsKnowledge = [
       'High-frequency market updates caused rendering jitter in charts.',
     solution:
       'Applied throttling, memoization, and batching to keep updates smooth and efficient.',
-    github: 'https://github.com/your-username/crypto-tracker',
+    github: 'https://github.com/HATAG-TECH/crypto-tracker',
     liveDemo: 'https://example.com/demo/crypto-tracker',
   },
   {
@@ -95,7 +95,7 @@ export const projectsKnowledge = [
     ],
     challenge: 'Concurrent updates caused stock consistency issues.',
     solution: 'Used transaction-safe writes and conflict checks for data integrity.',
-    github: 'https://github.com/your-username/inventory-management-system',
+    github: 'https://github.com/HATAG-TECH/inventory-management-system',
     liveDemo: 'https://example.com/demo/inventory-management',
   },
   {
@@ -115,7 +115,7 @@ export const projectsKnowledge = [
     challenge: 'Race conditions appeared during rapid ticket assignment.',
     solution:
       'Introduced optimistic locking and assignment validation before writes.',
-    github: 'https://github.com/your-username/helpdesk-queue-system',
+    github: 'https://github.com/HATAG-TECH/helpdesk-queue-system',
     liveDemo: 'https://example.com/demo/helpdesk-queue',
   },
   {
@@ -134,7 +134,7 @@ export const projectsKnowledge = [
     ],
     challenge: 'Drag interactions became slow with many cards.',
     solution: 'Reduced board-level re-renders by splitting and memoizing state slices.',
-    github: 'https://github.com/your-username/task-management-system',
+    github: 'https://github.com/HATAG-TECH/task-management-system',
     liveDemo: 'https://example.com/demo/task-management',
   },
   {
@@ -153,7 +153,7 @@ export const projectsKnowledge = [
     ],
     challenge: 'Invalid status transitions created inconsistent issue states.',
     solution: 'Implemented strict transition mapping and backend validation guards.',
-    github: 'https://github.com/your-username/bug-tracking-system',
+    github: 'https://github.com/HATAG-TECH/bug-tracking-system',
     liveDemo: 'https://example.com/demo/bug-tracker',
   },
   {
@@ -173,7 +173,7 @@ export const projectsKnowledge = [
     challenge: 'External API responses were inconsistent across categories.',
     solution:
       'Added response normalization and graceful fallback states for missing fields.',
-    github: 'https://github.com/your-username/news-app',
+    github: 'https://github.com/HATAG-TECH/news-app',
     liveDemo: 'https://example.com/demo/news-app',
   },
   {
@@ -194,7 +194,7 @@ export const projectsKnowledge = [
     challenge: 'Complex relational workflows increased query and permission complexity.',
     solution:
       'Normalized schema, added indexed queries, and centralized role-based access checks.',
-    github: 'https://github.com/your-username/job-portal-system',
+    github: 'https://github.com/HATAG-TECH/job-portal-system',
     liveDemo: 'https://example.com/demo/job-portal',
   },
 ];
@@ -305,3 +305,4 @@ export const quickActionPrompts = [
   { id: 'experience', label: 'Experience', prompt: 'What is his experience timeline?' },
   { id: 'contact', label: 'Contact info', prompt: 'How can I contact him?' },
 ];
+

@@ -73,10 +73,12 @@ function sortProjects(items, sortBy) {
 }
 
 async function shareProject(project) {
+  const hasLiveDemo =
+    project.demo && project.demo.startsWith('http') && !project.demo.includes('example.com');
   const shareData = {
     title: project.title,
     text: `Check out this project by Habtamu Shewamene: ${project.title}`,
-    url: project.demo || project.github,
+    url: hasLiveDemo ? project.demo : project.github,
   };
   if (navigator.share) {
     await navigator.share(shareData);
@@ -98,6 +100,7 @@ export default function ProjectGrid() {
   const [githubStatsMap, setGithubStatsMap] = useState({});
   const [shareNotice, setShareNotice] = useState('');
   const reducedMotion = useReducedMotion();
+  const githubStatsEnabled = import.meta.env.VITE_ENABLE_GITHUB_STATS === 'true';
 
   useEffect(() => {
     async function load() {
@@ -118,6 +121,11 @@ export default function ProjectGrid() {
   }, []);
 
   useEffect(() => {
+    if (!githubStatsEnabled) {
+      setGithubStatsMap({});
+      return undefined;
+    }
+
     let isMounted = true;
     async function loadGitHubStats() {
       const pairs = await Promise.all(
@@ -130,7 +138,7 @@ export default function ProjectGrid() {
     return () => {
       isMounted = false;
     };
-  }, [projects]);
+  }, [githubStatsEnabled, projects]);
 
   const techOptions = useMemo(() => {
     const allTech = new Set();

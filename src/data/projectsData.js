@@ -7,7 +7,7 @@ export const projects = [
     description:
       'A responsive dashboard tracking real-time cryptocurrency prices, market trends, and portfolio performance.',
     techStack: ['React', 'Tailwind CSS', 'WebSockets', 'Chart.js'],
-    github: 'https://github.com/your-username/crypto-tracker',
+    github: 'https://github.com/HATAG-TECH/crypto-tracker',
     demo: 'https://example.com/demo/crypto-tracker',
     category: 'Frontend',
     date: '2025-11-10',
@@ -58,7 +58,7 @@ export const projects = [
     title: 'Inventory Management System',
     description: 'Stock control platform for tracking inventory, suppliers, purchases, and sales.',
     techStack: ['Node.js', 'Express', 'MongoDB'],
-    github: 'https://github.com/your-username/inventory-management-system',
+    github: 'https://github.com/HATAG-TECH/inventory-management-system',
     demo: 'https://example.com/demo/inventory-management',
     category: 'Backend',
     date: '2025-09-16',
@@ -110,7 +110,7 @@ export const projects = [
     description:
       'Ticketing platform that manages support requests with priority queueing and agent assignment.',
     techStack: ['React', 'Node.js', 'Socket.io'],
-    github: 'https://github.com/your-username/helpdesk-queue-system',
+    github: 'https://github.com/HATAG-TECH/helpdesk-queue-system',
     demo: 'https://example.com/demo/helpdesk-queue',
     category: 'Full Stack',
     date: '2025-12-03',
@@ -162,7 +162,7 @@ export const projects = [
     description:
       'Kanban-style task manager with drag-and-drop workflows and team collaboration features.',
     techStack: ['React', 'Express', 'MongoDB', 'DnD Kit'],
-    github: 'https://github.com/your-username/task-management-system',
+    github: 'https://github.com/HATAG-TECH/task-management-system',
     demo: 'https://example.com/demo/task-management',
     category: 'Full Stack',
     date: '2025-08-22',
@@ -213,7 +213,7 @@ export const projects = [
     title: 'Bug Tracking System',
     description: 'Issue tracker to report, assign, and resolve software bugs for small teams.',
     techStack: ['MongoDB', 'Express', 'React', 'Node.js'],
-    github: 'https://github.com/your-username/bug-tracking-system',
+    github: 'https://github.com/HATAG-TECH/bug-tracking-system',
     demo: 'https://example.com/demo/bug-tracker',
     category: 'Backend',
     date: '2025-07-14',
@@ -264,7 +264,7 @@ export const projects = [
     title: 'Job Portal System (Java Full Stack)',
     description: 'Java full stack portal for job seekers, employers, and platform administrators.',
     techStack: ['Java', 'Spring Boot', 'MySQL', 'XAMPP'],
-    github: 'https://github.com/your-username/job-portal-system',
+    github: 'https://github.com/HATAG-TECH/job-portal-system',
     demo: 'https://example.com/demo/job-portal',
     category: 'Java',
     date: '2026-01-19',
@@ -311,3 +311,4 @@ export const projects = [
     ],
   },
 ];
+
