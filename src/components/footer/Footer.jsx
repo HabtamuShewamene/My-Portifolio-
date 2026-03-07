@@ -6,7 +6,13 @@ export default function Footer() {
       <div className="section-container theme-text-soft flex flex-col items-center justify-between gap-4 py-5 text-xs sm:flex-row">
         <p>Copyright 2026 HATAG Tech - Habtamu Shewamene</p>
         <div className="flex flex-wrap items-center justify-center gap-3 sm:justify-end">
-          <ResumeDownloadButton compact pulseOnLoad={false} />
+          <ResumeDownloadButton
+            label="Resume"
+            placement="footer"
+            variant="text"
+            compact
+            pulseOnLoad={false}
+          />
           <a
             href="https://github.com/HATAG-TECH"
             target="_blank"

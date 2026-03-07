@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { sendContactMessage } from '../../services/api.js';
+import ResumeDownloadButton from '../ui/ResumeDownloadButton.jsx';
 
 function validateForm({ name, email, message, consent }) {
   if (!name.trim() || !email.trim() || !message.trim()) {
@@ -185,6 +186,14 @@ export default function ContactForm() {
           >
             {status.submitting ? 'Sending...' : 'Send Message'}
           </button>
+
+          <div className="flex justify-center pt-1">
+            <ResumeDownloadButton
+              label="Download Resume PDF"
+              placement="contact"
+              pulseOnLoad={false}
+            />
+          </div>
         </motion.form>
       </div>
     </section>

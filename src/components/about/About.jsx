@@ -19,7 +19,7 @@ export default function About() {
           strong engineering come together to create modern digital experiences.
         </p>
         <div className="mt-5">
-          <ResumeDownloadButton />
+          <ResumeDownloadButton label="Get My Resume" placement="about" />
         </div>
       </div>
 

@@ -82,6 +82,7 @@ function ChatMessage({ message, isDark, themeTokens }) {
               label="Download Resume"
               compact
               pulseOnLoad={false}
+              placement="chat"
               className="w-full justify-center"
             />
           </div>
