@@ -41,20 +41,28 @@ export const contactController = {
         console.error('Failed to save contact message:', storeError.message);
       }
 
-      let emailResult = { success: false, devMode: false };
-      try {
-        emailResult = await emailService.sendContactEmail({ name, email, message });
-      } catch (emailError) {
-        console.error('Email delivery failed:', emailError.message);
-      }
-
-      return res.status(200).json({
-        success: contactSaved || Boolean(emailResult.success),
+      // Respond immediately so browser/proxy requests are not held open by SMTP latency.
+      const responsePayload = {
+        success: contactSaved,
         message: 'Message received successfully!',
         contactSaved,
-        emailDelivered: Boolean(emailResult.success),
-        devMode: emailResult.devMode || false,
-      });
+        emailDelivered: false,
+        devMode: false,
+      };
+
+      // Send email in background and log the result.
+      void emailService.sendContactEmail({ name, email, message })
+        .then((emailResult) => {
+          console.log('Background email result:', {
+            success: Boolean(emailResult?.success),
+            devMode: Boolean(emailResult?.devMode),
+          });
+        })
+        .catch((emailError) => {
+          console.error('Background email delivery failed:', emailError.message);
+        });
+
+      return res.status(200).json(responsePayload);
     } catch (error) {
       console.error('Contact controller error:', error);
       return res.status(200).json({
@@ -82,4 +90,3 @@ export const contactController = {
     }
   },
 };
-

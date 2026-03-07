@@ -8,6 +8,14 @@
     "start": "node server.js",
     "dev": "nodemon server.js"
   },
+  "nodemonConfig": {
+    "ignore": [
+      "data/**",
+      "server/data/**",
+      "backups/**",
+      "server/backups/**"
+    ]
+  },
   "author": "Habtamu Shewamene",
   "license": "MIT",
   "dependencies": {

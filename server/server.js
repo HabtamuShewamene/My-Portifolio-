@@ -1,5 +1,6 @@
 import app from './app.js';
 import { env } from './config/env.js';
+import { resolvedCorsOrigins } from './config/cors.js';
 import { initializeStore } from './models/jsonStore.js';
 
 function listenAsync(port) {
@@ -38,6 +39,8 @@ async function startServer() {
 
   const runningPort = await listenWithFallback(env.port);
   console.log(`Server listening on http://localhost:${runningPort}`);
+  console.log(`CORS enabled for: ${resolvedCorsOrigins.join(', ')}`);
+  console.log(`CORS test endpoint: http://localhost:${runningPort}/api/test`);
 }
 
 startServer().catch((error) => {
