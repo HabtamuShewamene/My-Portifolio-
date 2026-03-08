@@ -185,3 +185,23 @@ export async function fetchAnalyticsDashboard(period = 'all') {
   const data = await request('/analytics/dashboard', { params: { period } });
   return data?.data || null;
 }
+
+export async function trackAnalyticsLocation(payload = {}) {
+  const data = await request('/analytics/location', {
+    method: 'POST',
+    data: {
+      lat: payload.lat,
+      lng: payload.lng,
+      city: String(payload.city || 'unknown'),
+      country: String(payload.country || 'unknown'),
+      countryCode: String(payload.countryCode || payload.country || 'unknown').toUpperCase(),
+      timestamp: payload.timestamp || new Date().toISOString(),
+      sessionId: String(payload.sessionId || 'anonymous'),
+      consent: payload.consent === true,
+      dnt: payload.dnt === true,
+      page: String(payload.page || document.title || 'portfolio-home'),
+      path: String(payload.path || window.location.pathname),
+    },
+  });
+  return data?.data || null;
+}

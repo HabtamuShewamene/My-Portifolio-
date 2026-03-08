@@ -2,12 +2,14 @@ import { createContext, useCallback, useEffect, useMemo, useRef, useState } from
 import {
   fetchAnalyticsDashboard,
   fetchAnalyticsVisitors,
+  trackAnalyticsLocation,
   trackAnalyticsEvents,
 } from '../services/api.js';
 
 export const ANALYTICS_CONSENT_KEY = 'portfolio_analytics_consent';
 export const ANALYTICS_OPT_OUT_KEY = 'portfolio_analytics_opt_out';
 const SESSION_KEY = 'portfolio_analytics_session_id';
+const LOCATION_LAST_SENT_KEY = 'portfolio_analytics_location_last_sent';
 
 function createSessionId() {
   const random = Math.random().toString(36).slice(2, 10);
@@ -72,6 +74,7 @@ export function AnalyticsProvider({ children }) {
 
   const queueRef = useRef([]);
   const flushTimerRef = useRef(null);
+  const locationPingInFlightRef = useRef(false);
 
   const dnt = navigator.doNotTrack === '1' || window.doNotTrack === '1';
   const sessionId = useMemo(() => getSessionId(), []);
@@ -195,6 +198,58 @@ export function AnalyticsProvider({ children }) {
       window.removeEventListener('beforeunload', onUnload);
     };
   }, [flushQueue]);
+
+  useEffect(() => {
+    if (!canTrack || locationPingInFlightRef.current) return;
+
+    const lastSentMs = Number(window.localStorage.getItem(LOCATION_LAST_SENT_KEY) || 0);
+    const elapsed = Date.now() - lastSentMs;
+    if (elapsed < 10 * 60 * 1000) return;
+
+    const sendLocationPing = async (coords = null) => {
+      locationPingInFlightRef.current = true;
+      try {
+        await trackAnalyticsLocation({
+          lat: coords?.lat ?? null,
+          lng: coords?.lng ?? null,
+          city: 'unknown',
+          country: runtimeMeta.country,
+          countryCode: runtimeMeta.country,
+          sessionId,
+          consent,
+          dnt,
+          page: document.title || 'portfolio-home',
+          path: window.location.pathname,
+          timestamp: new Date().toISOString(),
+        });
+        window.localStorage.setItem(LOCATION_LAST_SENT_KEY, String(Date.now()));
+      } finally {
+        locationPingInFlightRef.current = false;
+      }
+    };
+
+    if (!('geolocation' in navigator)) {
+      sendLocationPing();
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        sendLocationPing({
+          lat: Number(position?.coords?.latitude),
+          lng: Number(position?.coords?.longitude),
+        });
+      },
+      () => {
+        sendLocationPing();
+      },
+      {
+        enableHighAccuracy: false,
+        timeout: 6000,
+        maximumAge: 10 * 60 * 1000,
+      },
+    );
+  }, [canTrack, consent, dnt, runtimeMeta.country, sessionId]);
 
   const value = useMemo(() => ({
     dashboard,
