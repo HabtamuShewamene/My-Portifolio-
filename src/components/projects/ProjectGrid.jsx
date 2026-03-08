@@ -8,6 +8,7 @@ import ShimmerSkeleton from '../ui/ShimmerSkeleton.jsx';
 import { projects as staticProjects } from '../../data/projectsData.js';
 import { fetchProjects } from '../../services/api.js';
 import { fetchGitHubStats } from '../../services/github.js';
+import { useAnalytics } from '../../hooks/useAnalytics.js';
 
 function normalizeProject(project, index) {
   const features = (project.features || []).map((item) =>
@@ -100,6 +101,7 @@ export default function ProjectGrid() {
   const [githubStatsMap, setGithubStatsMap] = useState({});
   const [shareNotice, setShareNotice] = useState('');
   const reducedMotion = useReducedMotion();
+  const { trackEvent } = useAnalytics();
   const githubStatsEnabled = import.meta.env.VITE_ENABLE_GITHUB_STATS === 'true';
 
   useEffect(() => {
@@ -186,6 +188,23 @@ export default function ProjectGrid() {
     window.setTimeout(() => setShareNotice(''), 1800);
   };
 
+  const handleTrackProjectView = (projectId) => {
+    trackEvent({
+      eventType: 'project_view',
+      projectId,
+      page: 'projects-section',
+    });
+  };
+
+  const handleTrackProjectClick = (projectId, projectAction) => {
+    trackEvent({
+      eventType: 'project_click',
+      projectId,
+      projectAction,
+      page: 'projects-section',
+    });
+  };
+
   return (
     <div className="space-y-8">
       <div>
@@ -241,12 +260,22 @@ export default function ProjectGrid() {
               >
                 <ProjectCard
                   project={project}
-                  onOpen={setSelectedProject}
+                  onOpen={(selected) => {
+                    trackEvent({
+                      eventType: 'project_click',
+                      projectId: selected.id,
+                      projectAction: 'details',
+                      page: 'projects-section',
+                    });
+                    setSelectedProject(selected);
+                  }}
                   onTechExplore={setActiveTech}
                   githubStats={githubStatsMap[project.id]}
                   compared={compareIds.includes(project.id)}
                   onCompareToggle={handleCompareToggle}
                   onShare={handleShare}
+                  onTrackProjectView={handleTrackProjectView}
+                  onTrackProjectClick={handleTrackProjectClick}
                 />
               </motion.div>
             ))}

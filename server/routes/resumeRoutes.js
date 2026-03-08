@@ -1,8 +1,13 @@
 import { Router } from 'express';
-import { getResumeStats, trackResumeDownload } from '../controllers/resumeController.js';
+import {
+	downloadResumeFile,
+	getResumeStats,
+	trackResumeDownload,
+} from '../controllers/resumeController.js';
 
 const router = Router();
 
+router.get('/download/:format', downloadResumeFile);
 router.post('/track', trackResumeDownload);
 router.get('/stats', getResumeStats);
 

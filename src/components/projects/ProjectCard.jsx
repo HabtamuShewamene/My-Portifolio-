@@ -1,4 +1,5 @@
 import { motion, useReducedMotion } from 'framer-motion';
+import { useEffect, useRef } from 'react';
 import { useTilt } from '../../hooks/useTilt.js';
 
 function formatDate(value) {
@@ -37,11 +38,34 @@ export default function ProjectCard({
   compared,
   onCompareToggle,
   onShare,
+  onTrackProjectView,
+  onTrackProjectClick,
 }) {
   const reducedMotion = useReducedMotion();
   const { tilt, onMouseMove, onMouseLeave } = useTilt(9);
   const snippetPreview = project.codeSnippets?.[0]?.code || '';
   const hasLiveDemo = Boolean(project.demo && project.demo.startsWith('http') && !project.demo.includes('example.com'));
+  const rootRef = useRef(null);
+
+  useEffect(() => {
+    if (!onTrackProjectView || !rootRef.current) return undefined;
+    let seen = false;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!seen && entry.isIntersecting && entry.intersectionRatio >= 0.4) {
+            seen = true;
+            onTrackProjectView(project.id);
+            observer.disconnect();
+          }
+        });
+      },
+      { threshold: [0.4] },
+    );
+
+    observer.observe(rootRef.current);
+    return () => observer.disconnect();
+  }, [onTrackProjectView, project.id]);
 
   const handleClick = () => {
     if (onOpen) onOpen(project);
@@ -49,6 +73,7 @@ export default function ProjectCard({
 
   return (
     <motion.article
+      ref={rootRef}
       className="glass-panel interactive group flex h-full cursor-pointer flex-col justify-between rounded-2xl p-5 outline-none transition-shadow hover:shadow-xl focus-visible:ring-2 focus-visible:ring-primary/70"
       style={{
         transform: `perspective(1000px) rotateX(${tilt.rotateX}deg) rotateY(${tilt.rotateY}deg)`,
@@ -156,7 +181,10 @@ export default function ProjectCard({
             target="_blank"
             rel="noreferrer"
             className="theme-button-secondary interactive inline-flex flex-1 items-center justify-center rounded-full px-3 py-1.5 transition"
-            onClick={(event) => event.stopPropagation()}
+            onClick={(event) => {
+              event.stopPropagation();
+              onTrackProjectClick?.(project.id, 'github');
+            }}
           >
             GitHub
           </a>
@@ -167,6 +195,7 @@ export default function ProjectCard({
             className={`theme-button-primary interactive inline-flex flex-1 items-center justify-center rounded-full px-3 py-1.5 transition ${hasLiveDemo ? '' : 'pointer-events-none opacity-60'}`}
             onClick={(event) => {
               event.stopPropagation();
+              if (hasLiveDemo) onTrackProjectClick?.(project.id, 'demo');
               if (!hasLiveDemo) event.preventDefault();
             }}
           >

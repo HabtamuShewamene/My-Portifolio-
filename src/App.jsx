@@ -8,6 +8,7 @@ import ShimmerSkeleton from './components/ui/ShimmerSkeleton.jsx';
 import ChatErrorBoundary from './components/ai/ChatErrorBoundary.jsx';
 import { useSectionReveal } from './hooks/useSectionReveal.js';
 import { useParallax } from './hooks/useParallax.js';
+import { useTrackPageView, useTrackSectionEngagement } from './hooks/useAnalytics.js';
 
 const About = lazy(() => import('./components/about/About.jsx'));
 const ProjectGrid = lazy(() => import('./components/projects/ProjectGrid.jsx'));
@@ -15,6 +16,7 @@ const Skills = lazy(() => import('./components/skills/Skills.jsx'));
 const Timeline = lazy(() => import('./components/experience/Timeline.jsx'));
 const ContactForm = lazy(() => import('./components/contact/ContactForm.jsx'));
 const ChatAssistant = lazy(() => import('./components/ai/ChatAssistant.jsx'));
+const AnalyticsDashboardPage = lazy(() => import('./pages/AnalyticsDashboardPage.jsx'));
 
 function SectionSkeleton() {
   return (
@@ -44,6 +46,8 @@ function RevealSection({ id, className = '', children }) {
 
 function HomePage() {
   const parallaxY = useParallax(110);
+  useTrackPageView('portfolio-home');
+  useTrackSectionEngagement(['home', 'about', 'projects', 'skills', 'experience', 'contact']);
 
   return (
     <motion.div
@@ -118,6 +122,7 @@ export default function App() {
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<HomePage />} />
+        <Route path="/analytics" element={<AnalyticsDashboardPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </AnimatePresence>

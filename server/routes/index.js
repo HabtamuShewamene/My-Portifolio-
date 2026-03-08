@@ -5,6 +5,7 @@ import chatRoutes from './chatRoutes.js';
 import statsRoutes from './statsRoutes.js';
 import visitorRoutes from './visitorRoutes.js';
 import resumeRoutes from './resumeRoutes.js';
+import analyticsRoutes from './analyticsRoutes.js';
 
 const router = Router();
 
@@ -18,5 +19,6 @@ router.use('/chat', chatRoutes);
 router.use('/stats', statsRoutes);
 router.use('/visitor', visitorRoutes);
 router.use('/resume', resumeRoutes);
+router.use('/analytics', analyticsRoutes);
 
 export default router;

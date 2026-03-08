@@ -16,3 +16,11 @@ export const chatLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
 });
+
+export const analyticsLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 180,
+  message: { ok: false, message: 'Too many analytics events. Slow down and try again.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
