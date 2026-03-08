@@ -9,10 +9,6 @@ const FORMAT_LABELS = {
   md: 'MD',
 };
 
-function isCustomizableFormat(format) {
-  return format === 'txt' || format === 'md';
-}
-
 export default function ResumeButton({
   label = 'Download Resume',
   icon = '📄',
@@ -29,6 +25,14 @@ export default function ResumeButton({
   const [includeFullResume, setIncludeFullResume] = useState(true);
   const [includeSkillsMatrix, setIncludeSkillsMatrix] = useState(true);
   const [includeContactDetails, setIncludeContactDetails] = useState(false);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const dragStateRef = useRef({
+    isDragging: false,
+    startX: 0,
+    startY: 0,
+    originX: 0,
+    originY: 0,
+  });
 
   useEffect(() => {
     let active = true;
@@ -58,12 +62,42 @@ export default function ResumeButton({
     };
   }, [isOpen]);
 
+  useEffect(() => {
+    if (!isOpen) return;
+    setDragOffset({ x: 0, y: 0 });
+  }, [isOpen]);
+
+  useEffect(() => {
+    const onPointerMove = (event) => {
+      if (!dragStateRef.current.isDragging) return;
+      setDragOffset({
+        x: dragStateRef.current.originX + (event.clientX - dragStateRef.current.startX),
+        y: dragStateRef.current.originY + (event.clientY - dragStateRef.current.startY),
+      });
+    };
+
+    const onPointerUp = () => {
+      dragStateRef.current.isDragging = false;
+    };
+
+    window.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointerup', onPointerUp);
+    return () => {
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerup', onPointerUp);
+    };
+  }, []);
+
+  const hasCustomSelection = !includeFullResume || !includeSkillsMatrix || includeContactDetails;
+  const effectiveFormat =
+    hasCustomSelection && (format === 'pdf' || format === 'docx') ? 'txt' : format;
+
   const onDownload = async () => {
     if (isLoading) return;
     setIsLoading(true);
     try {
       await downloadResume({
-        format,
+        format: effectiveFormat,
         placement,
         include: {
           fullResume: includeFullResume,
@@ -85,8 +119,6 @@ export default function ResumeButton({
         ? 'resume-btn resume-btn-tertiary'
         : 'resume-btn resume-btn-primary';
 
-  const customEnabled = isCustomizableFormat(format);
-
   return (
     <div ref={rootRef} className={`relative inline-flex ${className}`}>
       <button
@@ -101,83 +133,112 @@ export default function ResumeButton({
       </button>
 
       {isOpen && (
-        <div
-          ref={panelRef}
-          className="resume-menu theme-surface absolute right-0 top-[calc(100%+0.6rem)] z-50 w-[320px] rounded-2xl p-4"
-          role="dialog"
-          aria-label="Resume download options"
-        >
-          <h3 className="theme-text-primary text-sm font-semibold">Download Resume</h3>
-
-          <div className="mt-3">
-            <p className="theme-text-soft text-[11px] uppercase tracking-wide">Format</p>
-            <div className="mt-2 grid grid-cols-4 gap-2">
-              {Object.keys(FORMAT_LABELS).map((key) => (
-                <button
-                  key={key}
-                  type="button"
-                  onClick={() => setFormat(key)}
-                  className={`resume-chip ${format === key ? 'resume-chip-active' : ''}`}
-                >
-                  {FORMAT_LABELS[key]}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="mt-3">
-            <p className="theme-text-soft text-[11px] uppercase tracking-wide">Customization</p>
-            <div className="mt-2 space-y-1 text-sm">
-              <label className={`resume-check ${!customEnabled ? 'opacity-60' : ''}`}>
-                <input
-                  type="checkbox"
-                  checked={includeFullResume}
-                  disabled={!customEnabled}
-                  onChange={(event) => setIncludeFullResume(event.target.checked)}
-                />
-                <span>Full resume</span>
-              </label>
-              <label className={`resume-check ${!customEnabled ? 'opacity-60' : ''}`}>
-                <input
-                  type="checkbox"
-                  checked={includeSkillsMatrix}
-                  disabled={!customEnabled}
-                  onChange={(event) => setIncludeSkillsMatrix(event.target.checked)}
-                />
-                <span>Skills matrix</span>
-              </label>
-              <label className={`resume-check ${!customEnabled ? 'opacity-60' : ''}`}>
-                <input
-                  type="checkbox"
-                  checked={includeContactDetails}
-                  disabled={!customEnabled}
-                  onChange={(event) => setIncludeContactDetails(event.target.checked)}
-                />
-                <span>Contact details</span>
-              </label>
-            </div>
-            {!customEnabled && (
-              <p className="theme-text-soft mt-1 text-xs">
-                PDF and DOCX use the official static files.
-              </p>
-            )}
-          </div>
-
-          <div className="mt-4 flex items-center gap-2">
+        <div className="resume-modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-4">
+          <button
+            type="button"
+            aria-label="Close resume popup"
+            className="absolute inset-0 h-full w-full"
+            onClick={() => setIsOpen(false)}
+          />
+          <div
+            ref={panelRef}
+            className="resume-menu theme-surface relative w-[min(92vw,380px)] rounded-2xl p-4"
+            role="dialog"
+            aria-label="Resume download options"
+            style={{
+              transform: `translate(${dragOffset.x}px, ${dragOffset.y}px)`,
+            }}
+            onClick={(event) => event.stopPropagation()}
+          >
             <button
               type="button"
-              className="resume-btn resume-btn-primary w-full justify-center"
-              onClick={onDownload}
-              disabled={isLoading}
+              className="resume-drag-handle theme-text-soft mb-3 flex w-full items-center justify-between rounded-lg px-2 py-1 text-xs"
+              onPointerDown={(event) => {
+                dragStateRef.current = {
+                  isDragging: true,
+                  startX: event.clientX,
+                  startY: event.clientY,
+                  originX: dragOffset.x,
+                  originY: dragOffset.y,
+                };
+              }}
             >
-              <span aria-hidden="true">⬇</span>
-              <span>{isLoading ? 'Preparing...' : `Download ${FORMAT_LABELS[format]}`}</span>
+              <span>Drag to move</span>
+              <span aria-hidden="true">⠿</span>
             </button>
-          </div>
+            <h3 className="theme-text-primary text-sm font-semibold">Download Resume</h3>
 
-          <p className="theme-text-soft mt-3 text-xs">
-            Downloaded {typeof stats === 'number' ? stats : '--'} times
-          </p>
+            <div className="mt-3">
+              <p className="theme-text-soft text-[11px] uppercase tracking-wide">Format</p>
+              <div className="mt-2 grid grid-cols-4 gap-2">
+                {Object.keys(FORMAT_LABELS).map((key) => (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => setFormat(key)}
+                    className={`resume-chip ${format === key ? 'resume-chip-active' : ''}`}
+                  >
+                    {FORMAT_LABELS[key]}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="mt-3">
+              <p className="theme-text-soft text-[11px] uppercase tracking-wide">Customization</p>
+              <div className="mt-2 space-y-1 text-sm">
+                <label className="resume-check">
+                  <input
+                    type="checkbox"
+                    checked={includeFullResume}
+                    onChange={(event) => setIncludeFullResume(event.target.checked)}
+                  />
+                  <span>Full resume</span>
+                </label>
+                <label className="resume-check">
+                  <input
+                    type="checkbox"
+                    checked={includeSkillsMatrix}
+                    onChange={(event) => setIncludeSkillsMatrix(event.target.checked)}
+                  />
+                  <span>Skills matrix</span>
+                </label>
+                <label className="resume-check">
+                  <input
+                    type="checkbox"
+                    checked={includeContactDetails}
+                    onChange={(event) => setIncludeContactDetails(event.target.checked)}
+                  />
+                  <span>Contact details</span>
+                </label>
+              </div>
+              {hasCustomSelection && (format === 'pdf' || format === 'docx') && (
+                <p className="theme-text-soft mt-1 text-xs">
+                  Custom settings are exported as TXT for compatibility.
+                </p>
+              )}
+            </div>
+
+            <div className="mt-4 flex items-center gap-2">
+              <button
+                type="button"
+                className="resume-btn resume-btn-primary w-full justify-center"
+                onClick={onDownload}
+                disabled={isLoading}
+              >
+                <span aria-hidden="true">⬇</span>
+                <span>
+                  {isLoading
+                    ? 'Preparing...'
+                    : `Download ${FORMAT_LABELS[effectiveFormat]}`}
+                </span>
+              </button>
+            </div>
+
+            <p className="theme-text-soft mt-3 text-xs">
+              Downloaded {typeof stats === 'number' ? stats : '--'} times
+            </p>
+          </div>
         </div>
       )}
     </div>
