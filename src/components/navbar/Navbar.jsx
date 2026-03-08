@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion, useReducedMotion, useScroll, useSpring } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { useTheme } from '../../hooks/useTheme.js';
 import { useDebouncedScroll } from '../../hooks/useDebouncedScroll.js';
 
@@ -159,6 +160,9 @@ export default function Navbar() {
           </ul>
 
           <ThemeToggle isDark={isDark} onToggle={toggleTheme} />
+          <Link to="/analytics" className="theme-button-secondary rounded-full px-3 py-1.5 text-xs">
+            Analytics
+          </Link>
           <button
             type="button"
             className="interactive theme-icon-btn rounded-full border px-2.5 py-2 text-xs"
@@ -278,6 +282,15 @@ export default function Navbar() {
                 </button>
               </li>
             ))}
+            <li>
+              <Link
+                to="/analytics"
+                onClick={() => setOpen(false)}
+                className="theme-text-accent block w-full rounded-md px-2 py-2 text-left"
+              >
+                Analytics Dashboard
+              </Link>
+            </li>
           </ul>
         </motion.div>
       )}
