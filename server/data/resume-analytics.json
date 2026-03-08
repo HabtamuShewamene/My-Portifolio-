@@ -1,8 +1,8 @@
 {
-  "totalDownloads": 20,
+  "totalDownloads": 21,
   "byFormat": {
     "md": 1,
-    "pdf": 10,
+    "pdf": 11,
     "docx": 4,
     "txt": 5
   },
@@ -10,7 +10,7 @@
     "contact": 5,
     "hero": 7,
     "floating": 4,
-    "about": 4
+    "about": 5
   },
   "history": [
     {
@@ -192,6 +192,15 @@
       "ip": "::1",
       "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
       "ts": "2026-03-08T11:18:47.738Z"
+    },
+    {
+      "id": "1772972373768-w4u3f3",
+      "format": "pdf",
+      "placement": "about",
+      "source": "static",
+      "ip": "::1",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+      "ts": "2026-03-08T12:19:33.765Z"
     }
   ]
 }
