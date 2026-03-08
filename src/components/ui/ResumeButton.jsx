@@ -22,9 +22,6 @@ export default function ResumeButton({
   const [isLoading, setIsLoading] = useState(false);
   const [stats, setStats] = useState(null);
   const [format, setFormat] = useState('pdf');
-  const [includeFullResume, setIncludeFullResume] = useState(true);
-  const [includeSkillsMatrix, setIncludeSkillsMatrix] = useState(true);
-  const [includeContactDetails, setIncludeContactDetails] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const dragStateRef = useRef({
     isDragging: false,
@@ -88,22 +85,13 @@ export default function ResumeButton({
     };
   }, []);
 
-  const hasCustomSelection = !includeFullResume || !includeSkillsMatrix || includeContactDetails;
-  const effectiveFormat =
-    hasCustomSelection && (format === 'pdf' || format === 'docx') ? 'txt' : format;
-
   const onDownload = async () => {
     if (isLoading) return;
     setIsLoading(true);
     try {
       await downloadResume({
-        format: effectiveFormat,
+        format,
         placement,
-        include: {
-          fullResume: includeFullResume,
-          skillsMatrix: includeSkillsMatrix,
-          contactDetails: includeContactDetails,
-        },
       });
       setStats((prev) => (typeof prev === 'number' ? prev + 1 : prev));
       setIsOpen(false);
@@ -184,41 +172,6 @@ export default function ResumeButton({
               </div>
             </div>
 
-            <div className="mt-3">
-              <p className="theme-text-soft text-[11px] uppercase tracking-wide">Customization</p>
-              <div className="mt-2 space-y-1 text-sm">
-                <label className="resume-check">
-                  <input
-                    type="checkbox"
-                    checked={includeFullResume}
-                    onChange={(event) => setIncludeFullResume(event.target.checked)}
-                  />
-                  <span>Full resume</span>
-                </label>
-                <label className="resume-check">
-                  <input
-                    type="checkbox"
-                    checked={includeSkillsMatrix}
-                    onChange={(event) => setIncludeSkillsMatrix(event.target.checked)}
-                  />
-                  <span>Skills matrix</span>
-                </label>
-                <label className="resume-check">
-                  <input
-                    type="checkbox"
-                    checked={includeContactDetails}
-                    onChange={(event) => setIncludeContactDetails(event.target.checked)}
-                  />
-                  <span>Contact details</span>
-                </label>
-              </div>
-              {hasCustomSelection && (format === 'pdf' || format === 'docx') && (
-                <p className="theme-text-soft mt-1 text-xs">
-                  Custom settings are exported as TXT for compatibility.
-                </p>
-              )}
-            </div>
-
             <div className="mt-4 flex items-center gap-2">
               <button
                 type="button"
@@ -230,7 +183,7 @@ export default function ResumeButton({
                 <span>
                   {isLoading
                     ? 'Preparing...'
-                    : `Download ${FORMAT_LABELS[effectiveFormat]}`}
+                    : `Download ${FORMAT_LABELS[format]}`}
                 </span>
               </button>
             </div>

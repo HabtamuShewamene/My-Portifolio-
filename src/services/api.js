@@ -147,3 +147,41 @@ export async function fetchResumeStats() {
   const data = await request('/resume/stats');
   return data?.data || null;
 }
+
+export async function trackAnalyticsEvents(events = []) {
+  const data = await request('/analytics/track', {
+    method: 'POST',
+    data: { events },
+  });
+  return data?.data || null;
+}
+
+export async function fetchAnalyticsVisitors() {
+  const data = await request('/analytics/visitors');
+  return data?.data || null;
+}
+
+export async function fetchAnalyticsLocations(period = 'all') {
+  const data = await request('/analytics/locations', { params: { period } });
+  return data?.data || null;
+}
+
+export async function fetchAnalyticsSections(period = 'all') {
+  const data = await request('/analytics/sections', { params: { period } });
+  return data?.data || null;
+}
+
+export async function fetchAnalyticsProjects(period = 'all') {
+  const data = await request('/analytics/projects', { params: { period } });
+  return data?.data || null;
+}
+
+export async function fetchAnalyticsDevices(period = 'all') {
+  const data = await request('/analytics/devices', { params: { period } });
+  return data?.data || null;
+}
+
+export async function fetchAnalyticsDashboard(period = 'all') {
+  const data = await request('/analytics/dashboard', { params: { period } });
+  return data?.data || null;
+}
