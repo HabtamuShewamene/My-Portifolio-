@@ -570,9 +570,10 @@ h6 {
 
 .footer-link {
   position: relative;
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 0.45rem;
+  width: fit-content;
   color: var(--theme-text-muted);
 }
 
