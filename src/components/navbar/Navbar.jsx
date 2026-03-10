@@ -102,7 +102,7 @@ export default function Navbar() {
   };
 
   return (
-    <header className="theme-navbar fixed inset-x-0 top-0 z-40 border-b backdrop-blur-xl transition-colors duration-500">
+    <header className="theme-navbar fixed inset-x-0 top-0 z-40 border-b transition-colors duration-500">
       <motion.div
         className="absolute inset-x-0 top-0 h-[3px] origin-left"
         style={{
