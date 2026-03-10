@@ -71,9 +71,8 @@ function SkillChip({ skill }) {
           {skill.icon}
         </motion.div>
         <div className="min-w-0 flex-1">
-          <div className="theme-text-muted flex items-center justify-between text-xs">
+          <div className="theme-text-muted text-xs">
             <span className="truncate">{skill.name}</span>
-            <span className="theme-text-soft">{skill.level}%</span>
           </div>
           <div className="mt-1 h-1.5 w-full rounded-full bg-[color:var(--theme-border)]">
             <motion.div
