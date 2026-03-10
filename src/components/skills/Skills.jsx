@@ -71,19 +71,7 @@ function SkillChip({ skill }) {
           {skill.icon}
         </motion.div>
         <div className="min-w-0 flex-1">
-          <div className="theme-text-muted text-xs">
-            <span className="truncate">{skill.name}</span>
-          </div>
-          <div className="mt-1 h-1.5 w-full rounded-full bg-[color:var(--theme-border)]">
-            <motion.div
-              className="h-1.5 rounded-full"
-              style={{ background: 'linear-gradient(to right, var(--accent-color), #8b5cf6)' }}
-              initial={{ width: 0 }}
-              whileInView={{ width: `${skill.level}%` }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-            />
-          </div>
+          <span className="theme-text-muted block truncate text-sm font-medium">{skill.name}</span>
         </div>
       </div>
     </motion.div>

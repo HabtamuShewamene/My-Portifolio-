@@ -177,7 +177,7 @@ export default function Navbar() {
               <div className="min-w-0 leading-tight">
                 <p className="theme-text-soft text-[10px] uppercase tracking-[0.26em]">Portfolio</p>
                 <p className="truncate font-heading text-sm font-semibold tracking-[0.02em] theme-text-primary sm:text-base">
-                  HATAG Tech
+                  Habtamu Shewamene
                 </p>
                 <p className="truncate text-xs theme-text-soft">Full Stack Developer</p>
               </div>
