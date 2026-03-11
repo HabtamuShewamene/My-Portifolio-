@@ -16,7 +16,7 @@ function QuickActions({ actions, visible, onSelect, isDark, themeTokens }) {
           key={action.id}
           type="button"
           onClick={() => onSelect(action.prompt)}
-          className={`rounded-full border px-3 py-1 text-[11px] transition hover:scale-[1.02] ${
+          className={`rounded-full border px-3 py-1.5 text-[11px] transition hover:-translate-y-0.5 ${
             isDark ? 'text-slate-100' : 'text-slate-700'
           }`}
           style={{

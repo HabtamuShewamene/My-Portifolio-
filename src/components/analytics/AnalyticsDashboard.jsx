@@ -20,6 +20,8 @@ export default function AnalyticsDashboard() {
     error,
     period,
     setPeriod,
+    streamStatus,
+    lastLiveUpdateAt,
     refreshDashboard,
     consent,
     setConsent,
@@ -54,6 +56,10 @@ export default function AnalyticsDashboard() {
           <div>
             <h2 className="theme-text-primary font-heading text-2xl font-semibold">Visitor Analytics Dashboard</h2>
             <p className="theme-text-soft mt-1 text-sm">Anonymous, consent-based analytics with 30-day retention.</p>
+            <p className="theme-text-soft mt-1 text-xs">
+              Live stream: <strong className="capitalize">{streamStatus}</strong>
+              {lastLiveUpdateAt ? ` • Last update: ${new Date(lastLiveUpdateAt).toLocaleTimeString()}` : ''}
+            </p>
           </div>
 
           <div className="flex items-center gap-2">

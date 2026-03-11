@@ -5,13 +5,13 @@ let transporter;
 
 export function getMailerTransport() {
   if (transporter) return transporter;
-  if (!env.contactEmailUser || !env.contactEmailPass) return null;
+  if (!env.email?.user || !env.email?.pass) return null;
 
   transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: env.contactEmailUser,
-      pass: env.contactEmailPass,
+      user: env.email.user,
+      pass: env.email.pass,
     },
   });
   return transporter;

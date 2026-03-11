@@ -1,7 +1,7 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 const DEFAULT_TIMEOUT_MS = 30000;
 
-function buildUrl(path, params = {}) {
+export function buildApiUrl(path, params = {}) {
   const isAbsoluteBase = /^https?:\/\//i.test(API_BASE_URL);
   const url = new URL(`${API_BASE_URL}${path}`, window.location.origin);
   Object.entries(params).forEach(([key, value]) => {
@@ -46,7 +46,7 @@ async function request(path, options = {}) {
   }
 
   try {
-    const response = await fetch(buildUrl(path, params), {
+    const response = await fetch(buildApiUrl(path, params), {
       method,
       credentials,
       headers: requestHeaders,
@@ -183,5 +183,25 @@ export async function fetchAnalyticsDevices(period = 'all') {
 
 export async function fetchAnalyticsDashboard(period = 'all') {
   const data = await request('/analytics/dashboard', { params: { period } });
+  return data?.data || null;
+}
+
+export async function trackAnalyticsLocation(payload = {}) {
+  const data = await request('/analytics/location', {
+    method: 'POST',
+    data: {
+      lat: payload.lat,
+      lng: payload.lng,
+      city: String(payload.city || 'unknown'),
+      country: String(payload.country || 'unknown'),
+      countryCode: String(payload.countryCode || payload.country || 'unknown').toUpperCase(),
+      timestamp: payload.timestamp || new Date().toISOString(),
+      sessionId: String(payload.sessionId || 'anonymous'),
+      consent: payload.consent === true,
+      dnt: payload.dnt === true,
+      page: String(payload.page || document.title || 'portfolio-home'),
+      path: String(payload.path || window.location.pathname),
+    },
+  });
   return data?.data || null;
 }

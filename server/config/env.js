@@ -42,9 +42,10 @@ export const env = {
   trustProxy: process.env.TRUST_PROXY === 'true',
 
   email: {
-    user: process.env.CONTACT_EMAIL_USER,
-    pass: process.env.CONTACT_EMAIL_PASS,
-    to: process.env.CONTACT_EMAIL_TO || process.env.CONTACT_EMAIL_USER,
+    user: String(process.env.CONTACT_EMAIL_USER || '').trim(),
+    // Gmail app passwords are 16 chars; users often paste them with spaces.
+    pass: String(process.env.CONTACT_EMAIL_PASS || '').replace(/\s+/g, ''),
+    to: String(process.env.CONTACT_EMAIL_TO || process.env.CONTACT_EMAIL_USER || '').trim(),
     get configured() {
       return Boolean(this.user && this.pass);
     },

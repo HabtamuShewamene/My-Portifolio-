@@ -31,13 +31,21 @@ function formatTimestamp(ts) {
   }
 }
 
-function ChatMessage({ message, isDark, themeTokens }) {
+function ChatMessage({
+  message,
+  isDark,
+  themeTokens,
+  spokenCharIndex = 0,
+  isBeingSpoken = false,
+  onCopy,
+}) {
   const isUser = message.role === 'user';
   const contentParts = useMemo(() => parseContent(message.content), [message.content]);
+  const hasCode = useMemo(() => contentParts.some((part) => part.type === 'code'), [contentParts]);
   const bubbleClass = isUser
     ? 'text-white'
     : isDark
-      ? 'border text-slate-50'
+      ? 'border text-slate-100'
       : 'border text-slate-800';
 
   return (
@@ -48,34 +56,56 @@ function ChatMessage({ message, isDark, themeTokens }) {
       transition={{ duration: 0.2 }}
       className={`group flex ${isUser ? 'justify-end' : 'justify-start'}`}
     >
-      <div
-        className={`max-w-[85%] rounded-2xl px-3 py-2 text-xs leading-relaxed shadow-md ${bubbleClass}`}
+      <div className={`max-w-[82%] ${isUser ? 'items-end' : 'items-start'} flex flex-col`}>
+        <span className="mb-1 text-[10px] uppercase tracking-wide opacity-70">
+          {isUser ? 'You' : 'Assistant'}
+        </span>
+        <div
+          className={`relative rounded-2xl px-3 py-2 text-xs leading-relaxed shadow-sm ${bubbleClass}`}
         style={
           isUser
             ? { background: themeTokens.userMessage }
             : {
                 background: themeTokens.aiMessage,
-                borderColor: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(139,92,246,0.25)',
+                borderColor: isDark ? '#374151' : '#e5e7eb',
               }
         }
-      >
-        {contentParts.map((part, index) =>
-          part.type === 'code' ? (
-            <div key={`${message.id}-code-${index}`} className="my-2 overflow-hidden rounded-lg border border-white/15 bg-slate-950/85">
-              <div className="border-b border-white/10 px-3 py-1 text-[10px] uppercase tracking-wide text-slate-300">
-                {part.language}
-              </div>
-              <pre className="overflow-x-auto px-3 py-2 text-[11px] text-cyan-200">
-                <code>{part.value}</code>
-              </pre>
-            </div>
-          ) : (
-            <p key={`${message.id}-text-${index}`} className="whitespace-pre-line">
-              {part.value}
+        >
+          {!hasCode && isBeingSpoken ? (
+            <p className="whitespace-pre-line">
+              <span className="rounded bg-white/18 px-0.5">
+                {message.content.slice(0, Math.max(0, spokenCharIndex))}
+              </span>
+              <span>{message.content.slice(Math.max(0, spokenCharIndex))}</span>
             </p>
-          ),
-        )}
-        <span className="mt-1 hidden text-[10px] opacity-75 group-hover:block">
+          ) : contentParts.map((part, index) =>
+            part.type === 'code' ? (
+              <div key={`${message.id}-code-${index}`} className="my-2 overflow-hidden rounded-lg border border-white/15 bg-slate-950/85">
+                <div className="border-b border-white/10 px-3 py-1 text-[10px] uppercase tracking-wide text-slate-300">
+                  {part.language}
+                </div>
+                <pre className="overflow-x-auto px-3 py-2 text-[11px] text-cyan-200">
+                  <code>{part.value}</code>
+                </pre>
+              </div>
+            ) : (
+              <p key={`${message.id}-text-${index}`} className="whitespace-pre-line">
+                {part.value}
+              </p>
+            ),
+          )}
+          {!isUser && (
+            <button
+              type="button"
+              className="absolute -right-2 -top-2 hidden rounded-full border border-slate-400/30 bg-slate-900/80 px-1.5 py-0.5 text-[10px] text-white group-hover:block"
+              onClick={() => onCopy?.(message.content)}
+              aria-label="Copy message"
+            >
+              Copy
+            </button>
+          )}
+        </div>
+        <span className="mt-1 text-[10px] opacity-70">
           {formatTimestamp(message.ts)}
         </span>
       </div>

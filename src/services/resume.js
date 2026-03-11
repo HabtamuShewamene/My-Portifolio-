@@ -1,4 +1,4 @@
-import { trackResumeDownloadEvent } from './api.js';
+import { buildApiUrl, trackResumeDownloadEvent } from './api.js';
 
 const BASE_FILENAME = 'habtamu-shewamene-resume';
 const SUPPORTED_FORMATS = ['pdf', 'docx', 'txt', 'md'];
@@ -39,7 +39,7 @@ export async function downloadResume({
 
   const file = RESUME_FILES[normalizedFormat];
   const source = 'api-file';
-  const downloadUrl = `/api/resume/download/${normalizedFormat}`;
+  const downloadUrl = buildApiUrl(`/resume/download/${normalizedFormat}`);
   triggerDownloadFromUrl(downloadUrl, file.filename);
 
   try {

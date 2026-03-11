@@ -5,15 +5,15 @@ const DOTS = [0, 1, 2];
 
 function TypingIndicator({ onStop, themeTokens }) {
   return (
-    <div className="flex items-center justify-between gap-2">
+    <div className="flex items-center justify-between gap-2 rounded-2xl border px-3 py-2" style={{ borderColor: themeTokens.chatBorder, background: themeTokens.aiMessage }}>
       <div
-        className="inline-flex items-center gap-1 rounded-full border px-3 py-2"
-        style={{ borderColor: themeTokens.inputBorder, background: themeTokens.inputBg }}
+        className="inline-flex items-center gap-2"
       >
+        <span className="text-[11px] opacity-80">Assistant is typing...</span>
         {DOTS.map((dot) => (
           <motion.span
             key={dot}
-            className="h-1.5 w-1.5 rounded-full bg-slate-300"
+            className="h-1.5 w-1.5 rounded-full bg-slate-400"
             animate={{ y: [0, -4, 0] }}
             transition={{ duration: 0.7, repeat: Infinity, delay: dot * 0.1 }}
           />

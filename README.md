@@ -191,6 +191,80 @@ Base URL: `/api`
 - Set `CLIENT_ORIGIN` in backend env to your deployed frontend URL
 - If behind a reverse proxy, set `TRUST_PROXY=true`
 
+## Recommended Deployment
+This repo is set up best as:
+
+- Frontend on Vercel
+- Backend API on Render
+
+### 1) Prepare secrets safely
+- Do not commit `.env` or `server/.env`
+- Use `.env.example` as the template for production variables
+- If you have already stored real credentials in `server/.env`, rotate them before pushing the repo
+
+### 2) Deploy the backend on Render
+Create a new Render Web Service from this repo and point it to the `server` directory, or use the included `render.yaml` blueprint.
+
+Backend settings:
+
+- Root directory: `server`
+- Build command: `npm install`
+- Start command: `npm start`
+- Health check path: `/api/health`
+
+Backend environment variables:
+
+```env
+NODE_ENV=production
+PORT=5000
+CLIENT_ORIGIN=https://your-frontend-domain.vercel.app
+TRUST_PROXY=true
+CONTACT_EMAIL_USER=your_email@example.com
+CONTACT_EMAIL_PASS=your_email_app_password
+CONTACT_EMAIL_TO=your_destination_email@example.com
+GITHUB_USERNAME=HATAG-TECH
+GITHUB_REPO=my-portfolio
+LINKEDIN_FOLLOWERS=500
+DATA_DIR=data
+BACKUP_DIR=backups
+```
+
+After deploy, confirm the backend works at:
+
+- `https://your-backend-service.onrender.com/api/health`
+
+### 3) Deploy the frontend on Vercel
+Import the repo into Vercel and set the project root to `my-portfolio` if your repository contains other folders.
+
+Frontend settings:
+
+- Framework preset: `Vite`
+- Build command: `npm run build`
+- Output directory: `dist`
+
+Frontend environment variable:
+
+```env
+VITE_API_BASE_URL=https://your-backend-service.onrender.com/api
+```
+
+The included `vercel.json` adds a rewrite so client-side routes like `/analytics` work after refresh.
+
+### 4) Update CORS
+Set backend `CLIENT_ORIGIN` to the exact deployed frontend URL. If you later add a custom domain, update `CLIENT_ORIGIN` again.
+
+### 5) Verify production flows
+- Open the homepage and `/analytics`
+- Submit the contact form
+- Open the chat assistant
+- Download the resume
+- Check `GET /api/test` and `GET /api/health`
+
+### Why this now works
+- API requests already support `VITE_API_BASE_URL`
+- Resume downloads now use the configured API base URL too
+- Analytics live stream now uses the configured API base URL too
+
 ## Contact
 For opportunities, collaboration, or feedback:
 - GitHub: https://github.com/HATAG-TECH

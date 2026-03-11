@@ -42,31 +42,30 @@ export const contactController = {
         console.error('Failed to save contact message:', storeError.message);
       }
 
-      // Respond immediately so browser/proxy requests are not held open by SMTP latency.
-      const responsePayload = {
-        success: contactSaved,
-        message: 'Message received successfully!',
-        contactSaved,
-        emailDelivered: false,
-        devMode: false,
-      };
+      const emailResult = await emailService.sendContactEmail({ name, email, message });
 
-      // Send email in background and log the result.
-      void emailService.sendContactEmail({ name, email, message })
-        .then((emailResult) => {
-          console.log('Background email result:', {
-            success: Boolean(emailResult?.success),
-            devMode: Boolean(emailResult?.devMode),
-          });
-        })
-        .catch((emailError) => {
-          console.error('Background email delivery failed:', emailError.message);
+      if (!emailResult?.success) {
+        return res.status(502).json({
+          success: false,
+          message: 'Message was saved, but email delivery failed.',
+          error: emailResult?.error || 'Unable to send email right now.',
+          reason: emailResult?.reason || 'smtp_error',
+          contactSaved,
+          emailDelivered: false,
+          emailConfigured: emailService.isConfigured,
         });
+      }
 
-      return res.status(200).json(responsePayload);
+      return res.status(200).json({
+        success: true,
+        message: 'Message sent successfully.',
+        contactSaved,
+        emailDelivered: true,
+        messageId: emailResult?.messageId || null,
+      });
     } catch (error) {
       console.error('Contact controller error:', error);
-      return res.status(200).json({
+      return res.status(500).json({
         success: false,
         message: 'Message could not be processed right now. Please try again later.',
       });

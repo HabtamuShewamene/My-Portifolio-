@@ -24,3 +24,11 @@ export const analyticsLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
 });
+
+export const locationLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 30,
+  message: { ok: false, message: 'Too many location pings. Please retry later.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});

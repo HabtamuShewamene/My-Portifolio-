@@ -272,9 +272,10 @@ class JSONStore {
   }
 
   normalizeAnalyticsEvent(rawEvent = {}) {
+    const providedTs = Date.parse(rawEvent.ts || rawEvent.timestamp || '');
     return {
       id: this.createAnalyticsEventId(),
-      ts: new Date().toISOString(),
+      ts: Number.isFinite(providedTs) ? new Date(providedTs).toISOString() : new Date().toISOString(),
       sessionId: this.normalizeText(rawEvent.sessionId, 'anonymous', 72),
       eventType: this.normalizeText(rawEvent.eventType, 'unknown', 40),
       page: this.normalizeText(rawEvent.page, 'unknown', 120),
@@ -295,9 +296,37 @@ class JSONStore {
       timezone: this.normalizeText(rawEvent.timezone, 'unknown', 64),
       lat: Number.isFinite(Number(rawEvent.lat)) ? Number(rawEvent.lat) : null,
       lng: Number.isFinite(Number(rawEvent.lng)) ? Number(rawEvent.lng) : null,
+      anonIpHash: this.normalizeText(rawEvent.anonIpHash, 'anonymous', 64),
       consent: rawEvent.consent === true,
       dnt: rawEvent.dnt === true,
     };
+  }
+
+  getCountryCentroid(countryCode) {
+    const code = String(countryCode || '').toUpperCase();
+    const centroids = {
+      US: { lat: 39.8, lng: -98.5 },
+      CA: { lat: 56.1, lng: -106.3 },
+      GB: { lat: 55.3, lng: -3.4 },
+      DE: { lat: 51.1, lng: 10.4 },
+      FR: { lat: 46.2, lng: 2.2 },
+      ET: { lat: 9.1, lng: 40.5 },
+      IN: { lat: 22.6, lng: 79.0 },
+      CN: { lat: 35.9, lng: 104.2 },
+      BR: { lat: -14.2, lng: -51.9 },
+      AU: { lat: -25.3, lng: 133.8 },
+      ZA: { lat: -30.6, lng: 22.9 },
+      NG: { lat: 9.1, lng: 8.7 },
+      KE: { lat: -0.02, lng: 37.9 },
+      EG: { lat: 26.8, lng: 30.8 },
+      SA: { lat: 23.8, lng: 45.1 },
+      AE: { lat: 24.2, lng: 54.4 },
+      SE: { lat: 60.1, lng: 18.6 },
+      NO: { lat: 60.5, lng: 8.5 },
+      NL: { lat: 52.1, lng: 5.3 },
+      ES: { lat: 40.4, lng: -3.7 },
+    };
+    return centroids[code] || null;
   }
 
   async trackAnalytics(payload = {}) {
@@ -378,9 +407,12 @@ class JSONStore {
 
   async getAnalyticsLocations(period = 'all') {
     const state = await this.readAnalyticsState();
-    const events = this.getFilteredEvents(state, period);
+    const events = this.getFilteredEvents(state, period).filter((event) =>
+      ['location_ping', 'page_view'].includes(event.eventType),
+    );
     const byCountry = {};
     const byCity = {};
+    const pointsMap = {};
 
     for (const event of events) {
       const country = event.country || 'unknown';
@@ -398,6 +430,18 @@ class JSONStore {
       if (byCountry[countryKey].lat === null && event.lat !== null) byCountry[countryKey].lat = event.lat;
       if (byCountry[countryKey].lng === null && event.lng !== null) byCountry[countryKey].lng = event.lng;
 
+      if (event.lat !== null && event.lng !== null) {
+        const pointKey = `${event.lat.toFixed(2)}:${event.lng.toFixed(2)}`;
+        pointsMap[pointKey] = pointsMap[pointKey] || {
+          lat: Number(event.lat.toFixed(4)),
+          lng: Number(event.lng.toFixed(4)),
+          visitors: 0,
+          country: countryKey,
+          city,
+        };
+        pointsMap[pointKey].visitors += 1;
+      }
+
       byCity[cityKey] = byCity[cityKey] || {
         country: countryKey,
         city,
@@ -406,9 +450,27 @@ class JSONStore {
       byCity[cityKey].visitors += 1;
     }
 
+    Object.values(byCountry).forEach((row) => {
+      if (row.lat !== null && row.lng !== null) return;
+      const centroid = this.getCountryCentroid(row.country);
+      if (!centroid) return;
+      row.lat = centroid.lat;
+      row.lng = centroid.lng;
+      const key = `${centroid.lat.toFixed(2)}:${centroid.lng.toFixed(2)}`;
+      pointsMap[key] = pointsMap[key] || {
+        lat: centroid.lat,
+        lng: centroid.lng,
+        visitors: 0,
+        country: row.country,
+        city: 'unknown',
+      };
+      pointsMap[key].visitors += row.visitors;
+    });
+
     return {
       countries: Object.values(byCountry).sort((a, b) => b.visitors - a.visitors),
       cities: Object.values(byCity).sort((a, b) => b.visitors - a.visitors).slice(0, 30),
+      points: Object.values(pointsMap).sort((a, b) => b.visitors - a.visitors).slice(0, 400),
       updatedAt: state.updatedAt,
     };
   }
@@ -505,13 +567,57 @@ class JSONStore {
   }
 
   async getAnalyticsDashboard(period = 'all') {
-    const [visitors, locations, sections, projects, devices] = await Promise.all([
+    const [visitorsResult, locationsResult, sectionsResult, projectsResult, devicesResult] = await Promise.allSettled([
       this.getAnalyticsVisitors(),
       this.getAnalyticsLocations(period),
       this.getAnalyticsSections(period),
       this.getAnalyticsProjects(period),
       this.getAnalyticsDevices(period),
     ]);
+
+    const visitors = visitorsResult.status === 'fulfilled'
+      ? visitorsResult.value
+      : {
+          activeVisitors: 0,
+          totalUniqueVisitors: 0,
+          todayVisitors: 0,
+          updatedAt: new Date().toISOString(),
+        };
+
+    const locations = locationsResult.status === 'fulfilled'
+      ? locationsResult.value
+      : {
+          countries: [],
+          cities: [],
+          points: [],
+          updatedAt: new Date().toISOString(),
+        };
+
+    const sections = sectionsResult.status === 'fulfilled'
+      ? sectionsResult.value
+      : {
+          sections: [],
+          mostEngagingSection: null,
+          updatedAt: new Date().toISOString(),
+        };
+
+    const projects = projectsResult.status === 'fulfilled'
+      ? projectsResult.value
+      : {
+          period: String(period || 'all').toLowerCase(),
+          projects: [],
+          updatedAt: new Date().toISOString(),
+        };
+
+    const devices = devicesResult.status === 'fulfilled'
+      ? devicesResult.value
+      : {
+          devices: {},
+          browsers: {},
+          os: {},
+          screens: {},
+          updatedAt: new Date().toISOString(),
+        };
 
     return {
       period: String(period || 'all').toLowerCase(),

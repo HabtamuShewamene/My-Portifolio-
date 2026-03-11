@@ -7,7 +7,6 @@ import Footer from './components/footer/Footer.jsx';
 import ShimmerSkeleton from './components/ui/ShimmerSkeleton.jsx';
 import ChatErrorBoundary from './components/ai/ChatErrorBoundary.jsx';
 import { useSectionReveal } from './hooks/useSectionReveal.js';
-import { useParallax } from './hooks/useParallax.js';
 import { useTrackPageView, useTrackSectionEngagement } from './hooks/useAnalytics.js';
 
 const About = lazy(() => import('./components/about/About.jsx'));
@@ -45,7 +44,6 @@ function RevealSection({ id, className = '', children }) {
 }
 
 function HomePage() {
-  const parallaxY = useParallax(110);
   useTrackPageView('portfolio-home');
   useTrackSectionEngagement(['home', 'about', 'projects', 'skills', 'experience', 'contact']);
 
@@ -57,15 +55,6 @@ function HomePage() {
       exit={{ opacity: 0, y: -12 }}
       transition={{ duration: 0.45 }}
     >
-      <motion.div
-        className="theme-orb-primary pointer-events-none absolute -left-32 top-10 h-64 w-64 rounded-full blur-3xl"
-        style={{ y: parallaxY }}
-      />
-      <motion.div
-        className="theme-orb-secondary pointer-events-none absolute -right-24 bottom-0 h-72 w-72 rounded-full blur-3xl"
-        style={{ y: parallaxY }}
-      />
-
       <Navbar />
       <main className="relative space-y-0 pt-20">
         <section id="home" className="section-padding">
@@ -119,12 +108,24 @@ export default function App() {
   const location = useLocation();
 
   return (
-    <AnimatePresence mode="wait">
-      <Routes location={location} key={location.pathname}>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/analytics" element={<AnalyticsDashboardPage />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </AnimatePresence>
+    <div className="relative min-h-screen">
+      <div className="portfolio-backdrop" aria-hidden="true">
+        <div className="portfolio-backdrop__shapes" />
+        <div className="portfolio-backdrop__grid" />
+        <div className="portfolio-backdrop__glyphs" />
+        <div className="portfolio-backdrop__frames" />
+        <div className="portfolio-backdrop__grain" />
+      </div>
+
+      <div className="relative z-10">
+        <AnimatePresence mode="wait">
+          <Routes location={location} key={location.pathname}>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/analytics" element={<AnalyticsDashboardPage />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </AnimatePresence>
+      </div>
+    </div>
   );
 }

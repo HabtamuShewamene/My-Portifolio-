@@ -1,13 +1,16 @@
 import { createContext, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
+  buildApiUrl,
   fetchAnalyticsDashboard,
   fetchAnalyticsVisitors,
+  trackAnalyticsLocation,
   trackAnalyticsEvents,
 } from '../services/api.js';
 
 export const ANALYTICS_CONSENT_KEY = 'portfolio_analytics_consent';
 export const ANALYTICS_OPT_OUT_KEY = 'portfolio_analytics_opt_out';
 const SESSION_KEY = 'portfolio_analytics_session_id';
+const LOCATION_LAST_SENT_KEY = 'portfolio_analytics_location_last_sent';
 
 function createSessionId() {
   const random = Math.random().toString(36).slice(2, 10);
@@ -67,11 +70,17 @@ export function AnalyticsProvider({ children }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [period, setPeriod] = useState('all');
+  const [streamStatus, setStreamStatus] = useState('connecting');
+  const [lastLiveUpdateAt, setLastLiveUpdateAt] = useState('');
   const [consent, setConsentState] = useState(() => readBooleanStorage(ANALYTICS_CONSENT_KEY, false));
   const [optOut, setOptOutState] = useState(() => readBooleanStorage(ANALYTICS_OPT_OUT_KEY, false));
 
   const queueRef = useRef([]);
   const flushTimerRef = useRef(null);
+  const locationPingInFlightRef = useRef(false);
+  const streamRef = useRef(null);
+  const streamReconnectTimerRef = useRef(null);
+  const lastLiveRefreshRef = useRef(0);
 
   const dnt = navigator.doNotTrack === '1' || window.doNotTrack === '1';
   const sessionId = useMemo(() => getSessionId(), []);
@@ -98,12 +107,29 @@ export function AnalyticsProvider({ children }) {
     setLoading(true);
     setError('');
     try {
-      const [dashboardData, visitorData] = await Promise.all([
+      const [dashboardResult, visitorsResult] = await Promise.allSettled([
         fetchAnalyticsDashboard(nextPeriod),
         fetchAnalyticsVisitors(),
       ]);
-      setDashboard(dashboardData);
-      setVisitors(visitorData);
+
+      let hadFailure = false;
+
+      if (dashboardResult.status === 'fulfilled') {
+        setDashboard(dashboardResult.value);
+      } else {
+        hadFailure = true;
+      }
+
+      if (visitorsResult.status === 'fulfilled') {
+        setVisitors(visitorsResult.value);
+      } else {
+        hadFailure = true;
+      }
+
+      if (hadFailure) {
+        setError('Some analytics panels could not refresh. Live updates will retry automatically.');
+      }
+      setLastLiveUpdateAt(new Date().toISOString());
     } catch (err) {
       setError(err?.message || 'Failed to load analytics dashboard.');
     } finally {
@@ -170,13 +196,70 @@ export function AnalyticsProvider({ children }) {
 
   useEffect(() => {
     const interval = window.setInterval(() => {
+      // Fallback polling keeps dashboard fresh if SSE disconnects.
       refreshDashboard(period);
       flushQueue();
-    }, 10000);
+    }, 15000);
     return () => {
       window.clearInterval(interval);
     };
   }, [period, refreshDashboard, flushQueue]);
+
+  useEffect(() => {
+    const connectStream = () => {
+      if (streamRef.current) {
+        streamRef.current.close();
+        streamRef.current = null;
+      }
+
+      setStreamStatus('connecting');
+      const stream = new EventSource(buildApiUrl('/analytics/stream', { period }));
+      streamRef.current = stream;
+
+      stream.addEventListener('ready', () => {
+        setStreamStatus('connected');
+      });
+
+      stream.addEventListener('analytics_update', () => {
+        const now = Date.now();
+        // Avoid over-refreshing if many events are received in a burst.
+        if (now - lastLiveRefreshRef.current < 1000) return;
+        lastLiveRefreshRef.current = now;
+        refreshDashboard(period);
+      });
+
+      stream.addEventListener('heartbeat', () => {
+        setStreamStatus('connected');
+      });
+
+      stream.onerror = () => {
+        setStreamStatus('reconnecting');
+        if (streamRef.current) {
+          streamRef.current.close();
+          streamRef.current = null;
+        }
+        if (!streamReconnectTimerRef.current) {
+          streamReconnectTimerRef.current = window.setTimeout(() => {
+            streamReconnectTimerRef.current = null;
+            connectStream();
+          }, 2500);
+        }
+      };
+    };
+
+    connectStream();
+
+    return () => {
+      if (streamReconnectTimerRef.current) {
+        window.clearTimeout(streamReconnectTimerRef.current);
+        streamReconnectTimerRef.current = null;
+      }
+      if (streamRef.current) {
+        streamRef.current.close();
+        streamRef.current = null;
+      }
+    };
+  }, [period, refreshDashboard]);
 
   useEffect(() => {
     const onVisibilityChange = () => {
@@ -196,6 +279,58 @@ export function AnalyticsProvider({ children }) {
     };
   }, [flushQueue]);
 
+  useEffect(() => {
+    if (!canTrack || locationPingInFlightRef.current) return;
+
+    const lastSentMs = Number(window.localStorage.getItem(LOCATION_LAST_SENT_KEY) || 0);
+    const elapsed = Date.now() - lastSentMs;
+    if (elapsed < 10 * 60 * 1000) return;
+
+    const sendLocationPing = async (coords = null) => {
+      locationPingInFlightRef.current = true;
+      try {
+        await trackAnalyticsLocation({
+          lat: coords?.lat ?? null,
+          lng: coords?.lng ?? null,
+          city: 'unknown',
+          country: runtimeMeta.country,
+          countryCode: runtimeMeta.country,
+          sessionId,
+          consent,
+          dnt,
+          page: document.title || 'portfolio-home',
+          path: window.location.pathname,
+          timestamp: new Date().toISOString(),
+        });
+        window.localStorage.setItem(LOCATION_LAST_SENT_KEY, String(Date.now()));
+      } finally {
+        locationPingInFlightRef.current = false;
+      }
+    };
+
+    if (!('geolocation' in navigator)) {
+      sendLocationPing();
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        sendLocationPing({
+          lat: Number(position?.coords?.latitude),
+          lng: Number(position?.coords?.longitude),
+        });
+      },
+      () => {
+        sendLocationPing();
+      },
+      {
+        enableHighAccuracy: false,
+        timeout: 6000,
+        maximumAge: 10 * 60 * 1000,
+      },
+    );
+  }, [canTrack, consent, dnt, runtimeMeta.country, sessionId]);
+
   const value = useMemo(() => ({
     dashboard,
     visitors,
@@ -203,6 +338,8 @@ export function AnalyticsProvider({ children }) {
     error,
     period,
     setPeriod,
+    streamStatus,
+    lastLiveUpdateAt,
     refreshDashboard,
     trackEvent,
     flushQueue,
@@ -220,6 +357,8 @@ export function AnalyticsProvider({ children }) {
     error,
     period,
     refreshDashboard,
+    streamStatus,
+    lastLiveUpdateAt,
     trackEvent,
     flushQueue,
     consent,
