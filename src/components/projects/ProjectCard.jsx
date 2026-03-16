@@ -104,6 +104,12 @@ export default function ProjectCard({
             src={project.screenshot}
             alt={`${project.title} preview`}
             className="h-32 w-full object-cover"
+            onError={(event) => {
+              const image = event.currentTarget;
+              if (image.dataset.fallbackApplied === 'true') return;
+              image.dataset.fallbackApplied = 'true';
+              image.src = '/admin.jpg';
+            }}
             whileHover={reducedMotion ? undefined : { scale: 1.08, rotate: 0.5 }}
             transition={{ duration: 0.35 }}
             loading="lazy"
