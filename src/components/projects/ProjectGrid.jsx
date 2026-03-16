@@ -29,8 +29,10 @@ function normalizeProject(project, index) {
     complexity: project.complexity || ((index % 5) + 1),
     difficulty: project.difficulty || ((index % 4) + 2),
     screenshot:
-      project.screenshot ||
-      `https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80`,
+      project.id === 'job-portal'
+        ? '/admin.jpg'
+        : project.screenshot ||
+          `https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80`,
     architecture:
       project.architecture ||
       [
