@@ -108,7 +108,12 @@ export default function ProjectCard({
               const image = event.currentTarget;
               if (image.dataset.fallbackApplied === 'true') return;
               image.dataset.fallbackApplied = 'true';
-              image.src = '/admin.jpg';
+              // Use a conceptually appropriate fallback for Bug Tracking System
+              if (project.id === 'bug-tracker') {
+                image.src = '/bug-tracker.jpg';
+              } else {
+                image.src = '/admin.jpg';
+              }
             }}
             whileHover={reducedMotion ? undefined : { scale: 1.08, rotate: 0.5 }}
             transition={{ duration: 0.35 }}
