@@ -1,24 +1,33 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 function useAnimatedValue(targetValue, duration = 600) {
-  const [value, setValue] = useState(0);
+  const [value, setValue] = useState(() => Number(targetValue || 0));
+  const valueRef = useRef(Number(targetValue || 0));
+
+  useEffect(() => {
+    valueRef.current = value;
+  }, [value]);
 
   useEffect(() => {
     const target = Number(targetValue || 0);
     const start = performance.now();
-    const startValue = value;
+    const startValue = valueRef.current;
 
     let rafId = 0;
     const tick = (now) => {
       const elapsed = Math.min(1, (now - start) / duration);
       const next = Math.round(startValue + (target - startValue) * elapsed);
       setValue(next);
-      if (elapsed < 1) rafId = window.requestAnimationFrame(tick);
+      if (elapsed < 1) {
+        rafId = window.requestAnimationFrame(tick);
+      } else {
+        valueRef.current = target;
+      }
     };
 
     rafId = window.requestAnimationFrame(tick);
     return () => window.cancelAnimationFrame(rafId);
-  }, [duration, targetValue, value]);
+  }, [duration, targetValue]);
 
   return value;
 }
