@@ -3,7 +3,7 @@ export const PROJECT_CATEGORIES = ['All', 'Frontend', 'Backend', 'Full Stack', '
 export const projects = [
   {
     id: 'agro-ecommerce-platform',
-    title: 'GREENHARVERT-SOLUTIONS',
+    title: 'GREENHARVEST-SOLUTIONS',
     description:
       'A full-stack marketplace that modernizes agricultural trading by connecting farmers, admins, and customers with centralized product, inventory, and order management.',
     techStack: ['React', 'Node.js', 'Express.js', 'MongoDB', 'PostgreSQL', 'JWT'],
