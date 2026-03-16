@@ -283,7 +283,7 @@ export default function ChatAssistant() {
   const { isDark, toggleTheme, setThemeMode, setManualTheme } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState(() => [createWelcomeMessage()]);
   const [draft, setDraft] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [helperText, setHelperText] = useState('');
@@ -312,8 +312,6 @@ export default function ChatAssistant() {
       setHelperText(errorMessage);
     },
   });
-
-  const showQuickActions = !draft.trim();
 
   const lastAssistantMessage = [...messages].reverse().find((message) => message.role === 'assistant');
 
@@ -512,7 +510,6 @@ export default function ChatAssistant() {
         return true;
       case 'chat-clear':
         resetConversation();
-        setMessages([createWelcomeMessage()]);
         appendAssistantMessage('Chat has been cleared.', 'chat');
         return true;
       case 'voice-help':
@@ -551,13 +548,6 @@ export default function ChatAssistant() {
     setDraft(transcript);
     sendMessage(transcript);
   }
-
-  useEffect(() => {
-    if (!isOpen) return;
-    if (!messages.length) {
-      setMessages([createWelcomeMessage()]);
-    }
-  }, [isOpen, messages.length]);
 
   const sendMessage = (nextText) => {
     const trimmed = nextText.trim();

@@ -3,7 +3,7 @@ function donutStyle(parts) {
   const total = values.reduce((sum, value) => sum + Number(value || 0), 0) || 1;
   const palette = ['#3b82f6', '#22c55e', '#f59e0b', '#8b5cf6', '#f43f5e', '#06b6d4'];
   let cursor = 0;
-  const segments = Object.entries(parts || {}).map(([label, raw], index) => {
+  const segments = Object.entries(parts || {}).map(([, raw], index) => {
     const value = Number(raw || 0);
     const pct = (value / total) * 100;
     const start = cursor;

@@ -1,4 +1,4 @@
-import { createContext, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   buildApiUrl,
   fetchAnalyticsDashboard,
@@ -6,6 +6,7 @@ import {
   trackAnalyticsLocation,
   trackAnalyticsEvents,
 } from '../services/api.js';
+import { AnalyticsContext } from './analyticsContextObject.js';
 
 export const ANALYTICS_CONSENT_KEY = 'portfolio_analytics_consent';
 export const ANALYTICS_OPT_OUT_KEY = 'portfolio_analytics_opt_out';
@@ -61,8 +62,6 @@ function readBooleanStorage(key, fallback = false) {
   if (value === null) return fallback;
   return value === 'true';
 }
-
-export const AnalyticsContext = createContext(null);
 
 export function AnalyticsProvider({ children }) {
   const [dashboard, setDashboard] = useState(null);

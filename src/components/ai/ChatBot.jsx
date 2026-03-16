@@ -1,4 +1,4 @@
-import { memo, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useChat } from '../../hooks/useChat.js';
 import { useTheme } from '../../hooks/useTheme.js';
@@ -184,12 +184,12 @@ export default function ChatBot() {
     };
   };
 
-  const onDragMove = (event) => {
+  const onDragMove = useCallback((event) => {
     if (!isDragging) return;
     const nextX = dragRef.current.baseX + (event.clientX - dragRef.current.startX);
     const nextY = dragRef.current.baseY + (event.clientY - dragRef.current.startY);
     setDragPosition({ x: nextX, y: nextY });
-  };
+  }, [isDragging]);
 
   const stopDrag = () => setIsDragging(false);
 
@@ -201,7 +201,7 @@ export default function ChatBot() {
       window.removeEventListener('pointermove', onDragMove);
       window.removeEventListener('pointerup', stopDrag);
     };
-  }, [isDragging]);
+  }, [isDragging, onDragMove]);
 
   const floatingButtonClass = isDark
     ? 'from-blue-500 to-purple-600 shadow-blue-500/45'

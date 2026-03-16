@@ -2,6 +2,70 @@ export const PROJECT_CATEGORIES = ['All', 'Frontend', 'Backend', 'Full Stack', '
 
 export const projects = [
   {
+    id: 'agro-ecommerce-platform',
+    title: 'GREENHARVEST-SOLUTIONS',
+    description:
+      'A full-stack marketplace that modernizes agricultural trading by connecting farmers, admins, and customers with centralized product, inventory, and order management.',
+    techStack: ['React', 'Node.js', 'Express.js', 'MongoDB', 'PostgreSQL', 'JWT'],
+    github: 'https://github.com/HATAG-TECH/agro-ecommerce-platform',
+    demo: 'https://example.com/demo/agro-ecommerce-platform',
+    category: 'Full Stack',
+    date: '2026-12-01',
+    complexity: 5,
+    difficulty: 5,
+    screenshot:
+      'https://images.unsplash.com/photo-1471193945509-9ad0617afabf?auto=format&fit=crop&w=1200&q=80',
+    features: [
+      {
+        title: 'Role-Based Access',
+        icon: 'RB',
+        detail: 'JWT authentication with admin and farmer role permissions across protected APIs.',
+      },
+      {
+        title: 'Product & Category Management',
+        icon: 'PC',
+        detail: 'Admins and farmers manage products, categories, and inventory through dashboard workflows.',
+      },
+      {
+        title: 'Order Processing',
+        icon: 'OP',
+        detail: 'Customers place orders through secure checkout with tracked order lifecycle states.',
+      },
+    ],
+    challenges: [
+      {
+        challenge: 'Balancing multi-role authorization with flexible API endpoints.',
+        solution: 'Implemented centralized JWT middleware and role-aware route guards.',
+      },
+      {
+        challenge: 'Maintaining consistency between inventory and order updates.',
+        solution: 'Added transactional update flows and strict server-side validation.',
+      },
+    ],
+    architecture: [
+      { name: 'Frontend', role: 'React client for browsing, ordering, and dashboard operations' },
+      { name: 'Backend', role: 'Node.js + Express REST API with modular services and controllers' },
+      { name: 'Data Layer', role: 'Normalized PostgreSQL schema with MongoDB support for flexible metadata' },
+    ],
+    codeSnippets: [
+      {
+        label: 'JWT Guard',
+        language: 'javascript',
+        code: `export function requireRole(...roles) {\n  return (req, res, next) => {\n    if (!req.user || !roles.includes(req.user.role)) return res.status(403).json({ message: 'Forbidden' });\n    next();\n  };\n}`,
+      },
+      {
+        label: 'Order Inventory Sync',
+        language: 'javascript',
+        code: `await db.tx(async (tx) => {\n  const product = await tx.one('SELECT stock FROM products WHERE id=$1 FOR UPDATE', [productId]);\n  if (product.stock < qty) throw new Error('Insufficient stock');\n  await tx.none('UPDATE products SET stock = stock - $1 WHERE id=$2', [qty, productId]);\n  await tx.none('INSERT INTO orders(user_id,total) VALUES($1,$2)', [userId, total]);\n});`,
+      },
+    ],
+    metrics: [
+      { label: 'Auth Coverage', value: 94 },
+      { label: 'Order Success Rate', value: 89 },
+      { label: 'Inventory Accuracy', value: 91 },
+    ],
+  },
+  {
     id: 'crypto-tracker',
     title: 'Crypto Tracker',
     description:
@@ -220,7 +284,7 @@ export const projects = [
     complexity: 3,
     difficulty: 3,
     screenshot:
-      'https://images.unsplash.com/photo-1517142089942-ba376ce32a0f?auto=format&fit=crop&w=1200&q=80',
+      '/bug-tracker.jpg',
     features: [
       { title: 'Issue Lifecycle', icon: 'LC', detail: 'Open, in-progress, and resolved flow.' },
       { title: 'Severity Tracking', icon: 'SV', detail: 'Prioritize bugs by impact and urgency.' },
@@ -271,7 +335,7 @@ export const projects = [
     complexity: 5,
     difficulty: 5,
     screenshot:
-      'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1200&q=80',
+      '/admin.jpg',
     features: [
       { title: 'Multi-Role Access', icon: 'RA', detail: 'Distinct flows for seekers, employers, admins.' },
       { title: 'Application Pipeline', icon: 'AP', detail: 'Track candidate stages and recruiter actions.' },

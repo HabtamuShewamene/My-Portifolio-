@@ -15,7 +15,7 @@ function createCsv(rows = []) {
 }
 
 export default function ProjectsRanking({ projectsData, period, onPeriodChange }) {
-  const rows = projectsData?.projects || [];
+  const rows = useMemo(() => projectsData?.projects || [], [projectsData]);
 
   const exportCsv = () => {
     const csv = createCsv(rows);

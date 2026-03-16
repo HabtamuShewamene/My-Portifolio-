@@ -20,7 +20,7 @@ export function useSectionReveal({ once = true, amount = 0.2 } = {}) {
   }, [controls, isInView, once, reducedMotion]);
 
   return {
-    ref,
+    sectionRef: ref,
     controls,
     variants: {
       hidden: { opacity: 0, y: 40, scale: 0.98, filter: 'blur(8px)' },

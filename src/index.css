@@ -569,10 +569,28 @@ h6 {
   background: linear-gradient(to right, var(--accent-color), transparent);
 }
 
-.footer-panel {
-  background: linear-gradient(180deg, color-mix(in oklab, var(--theme-surface-elevated) 98%, transparent), color-mix(in oklab, var(--theme-surface) 100%, transparent));
-  border: 1px solid color-mix(in oklab, var(--theme-border-medium) 80%, transparent);
+.footer-card {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at top right, color-mix(in oklab, var(--accent-soft) 72%, transparent) 0, transparent 34%),
+    linear-gradient(180deg, color-mix(in oklab, var(--theme-surface-elevated) 98%, transparent), color-mix(in oklab, var(--theme-surface) 100%, transparent));
+  border: 1px solid color-mix(in oklab, var(--theme-border-medium) 82%, transparent);
   box-shadow: var(--theme-shadow);
+}
+
+.footer-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, color-mix(in oklab, var(--theme-overlay) 55%, transparent), transparent 32%);
+}
+
+.footer-mark {
+  color: var(--theme-text-on-accent);
+  background: linear-gradient(135deg, var(--accent-color), color-mix(in oklab, var(--accent-secondary) 72%, var(--accent-color)));
+  box-shadow: 0 14px 30px color-mix(in oklab, var(--accent-glow) 90%, transparent);
 }
 
 .footer-heading {
@@ -590,6 +608,11 @@ h6 {
   gap: 0.45rem;
   width: fit-content;
   color: var(--theme-text-muted);
+}
+
+.footer-link--compact {
+  font-size: 0.95rem;
+  line-height: 1.4;
 }
 
 .footer-link::after {
@@ -613,9 +636,29 @@ h6 {
   transform: scaleX(1);
 }
 
-.footer-quote {
-  background: var(--theme-quote);
-  border-left: 3px solid color-mix(in oklab, var(--accent-color) 65%, transparent);
+.footer-social {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 999px;
+  color: var(--theme-text-muted);
+  border: 1px solid color-mix(in oklab, var(--theme-border-medium) 78%, transparent);
+  background: color-mix(in oklab, var(--theme-background-secondary) 74%, transparent);
+  box-shadow: inset 0 1px 0 color-mix(in oklab, white 6%, transparent);
+}
+
+.footer-social:hover {
+  color: var(--theme-text);
+  border-color: color-mix(in oklab, var(--accent-color) 45%, var(--theme-border-medium));
+  background: color-mix(in oklab, var(--accent-soft) 55%, var(--theme-surface-elevated));
+  transform: translateY(-1px);
+}
+
+.footer-divider {
+  position: relative;
+  border-top: 1px solid color-mix(in oklab, var(--theme-border-medium) 75%, transparent);
 }
 
 .skeleton-shimmer {

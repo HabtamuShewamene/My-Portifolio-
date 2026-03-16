@@ -1,10 +1,11 @@
-import { createContext, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ACCENT_PRESETS,
   THEME_CONFIG,
   THEME_STORAGE_KEYS,
   resolveTimeTheme,
 } from '../theme/themeConfig.js';
+import { ThemeContext } from './themeContextObject.js';
 
 function hexToRgb(hex) {
   const normalized = hex.replace('#', '').trim();
@@ -33,36 +34,31 @@ function getSystemTheme() {
   return 'light';
 }
 
-export const ThemeContext = createContext(null);
+function readStoredThemeMode() {
+  const storedMode = window.localStorage.getItem(THEME_STORAGE_KEYS.mode);
+  return storedMode === 'manual' || storedMode === 'system' || storedMode === 'time'
+    ? storedMode
+    : 'system';
+}
+
+function readStoredManualTheme() {
+  const storedManual = window.localStorage.getItem(THEME_STORAGE_KEYS.manualTheme);
+  return storedManual === 'dark' || storedManual === 'light' ? storedManual : 'dark';
+}
+
+function readStoredAccent() {
+  const storedAccent = window.localStorage.getItem(THEME_STORAGE_KEYS.accent);
+  if (storedAccent) return storedAccent;
+  const seedTheme = resolveTimeTheme();
+  return THEME_CONFIG[seedTheme].accent;
+}
 
 export function ThemeProvider({ children }) {
-  const [themeMode, setThemeMode] = useState('system');
-  const [manualTheme, setManualTheme] = useState('dark');
-  const [systemTheme, setSystemTheme] = useState('dark');
-  const [timeTheme, setTimeTheme] = useState(resolveTimeTheme());
-  const [accentColor, setAccentColor] = useState(THEME_CONFIG.dark.accent);
-
-  useEffect(() => {
-    const storedMode = window.localStorage.getItem(THEME_STORAGE_KEYS.mode);
-    const storedManual = window.localStorage.getItem(THEME_STORAGE_KEYS.manualTheme);
-    const storedAccent = window.localStorage.getItem(THEME_STORAGE_KEYS.accent);
-
-    if (storedMode === 'manual' || storedMode === 'system' || storedMode === 'time') {
-      setThemeMode(storedMode);
-    }
-    if (storedManual === 'dark' || storedManual === 'light') {
-      setManualTheme(storedManual);
-    }
-    if (storedAccent) {
-      setAccentColor(storedAccent);
-    } else {
-      const seedTheme = resolveTimeTheme();
-      setAccentColor(THEME_CONFIG[seedTheme].accent);
-    }
-
-    setSystemTheme(getSystemTheme());
-    setTimeTheme(resolveTimeTheme());
-  }, []);
+  const [themeMode, setThemeMode] = useState(readStoredThemeMode);
+  const [manualTheme, setManualTheme] = useState(readStoredManualTheme);
+  const [systemTheme, setSystemTheme] = useState(getSystemTheme);
+  const [timeTheme, setTimeTheme] = useState(resolveTimeTheme);
+  const [accentColor, setAccentColor] = useState(readStoredAccent);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia?.('(prefers-color-scheme: dark)');
@@ -138,27 +134,24 @@ export function ThemeProvider({ children }) {
     root.style.setProperty('--theme-quote', themeTokens.quote);
   }, [accentColor, effectiveTheme, themeMode]);
 
-  const toggleTheme = () => {
+  const toggleTheme = useCallback(() => {
     const next = effectiveTheme === 'dark' ? 'light' : 'dark';
     setThemeMode('manual');
     setManualTheme(next);
-  };
+  }, [effectiveTheme]);
 
-  const contextValue = useMemo(
-    () => ({
-      themeMode,
-      setThemeMode,
-      manualTheme,
-      setManualTheme,
-      effectiveTheme,
-      toggleTheme,
-      accentColor,
-      setAccentColor,
-      accentPresets: ACCENT_PRESETS,
-      isDark: effectiveTheme === 'dark',
-    }),
-    [accentColor, effectiveTheme, manualTheme, themeMode],
-  );
+  const contextValue = {
+    themeMode,
+    setThemeMode,
+    manualTheme,
+    setManualTheme,
+    effectiveTheme,
+    toggleTheme,
+    accentColor,
+    setAccentColor,
+    accentPresets: ACCENT_PRESETS,
+    isDark: effectiveTheme === 'dark',
+  };
 
   return <ThemeContext.Provider value={contextValue}>{children}</ThemeContext.Provider>;
 }

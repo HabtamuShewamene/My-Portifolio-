@@ -28,15 +28,15 @@ function SectionSkeleton() {
 }
 
 function RevealSection({ id, className = '', children }) {
-  const reveal = useSectionReveal({ once: true, amount: 0.22 });
+  const { sectionRef, controls, variants } = useSectionReveal({ once: true, amount: 0.22 });
   return (
     <motion.section
       id={id}
-      ref={reveal.ref}
+      ref={sectionRef}
       className={`section-padding ${className}`}
-      variants={reveal.variants}
+      variants={variants}
       initial="hidden"
-      animate={reveal.controls}
+      animate={controls}
     >
       <div className="section-container">{children}</div>
     </motion.section>

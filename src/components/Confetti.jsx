@@ -1,7 +1,7 @@
 import { useRef, useEffect } from 'react';
 
 // simple confetti effect triggered externally by calling `trigger()` on the ref
-export default function Confetti({ trigger }) {
+export default function Confetti({ triggerRef }) {
   const canvasRef = useRef(null);
 
   useEffect(() => {
@@ -45,7 +45,9 @@ export default function Confetti({ trigger }) {
       if (pieces.length) animationId = requestAnimationFrame(draw);
     };
 
-    trigger.current = () => {
+    if (!triggerRef) return undefined;
+
+    triggerRef.current = () => {
       spawn();
       draw();
     };
@@ -55,8 +57,9 @@ export default function Confetti({ trigger }) {
     return () => {
       window.removeEventListener('resize', resize);
       cancelAnimationFrame(animationId);
+      triggerRef.current = null;
     };
-  }, [trigger]);
+  }, [triggerRef]);
 
   return (
     <canvas

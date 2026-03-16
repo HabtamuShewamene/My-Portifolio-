@@ -120,7 +120,7 @@ export default function Hero() {
               transition={{ duration: 0.5 }}
             />
             <img
-              src="/profile-photo.jpg"
+              src="/linkdin2.png.png"
               alt="Habtamu Shewamene profile photo"
               className="relative h-full w-full object-cover object-center"
               loading="eager"

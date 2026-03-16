@@ -15,14 +15,7 @@ export function useTypewriter(words, options = {}) {
   const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
-    if (!entries.length) {
-      setDisplayText('');
-      return;
-    }
-    if (reducedMotion) {
-      setDisplayText(entries[wordIndex % entries.length]);
-      return;
-    }
+    if (!entries.length || reducedMotion) return undefined;
 
     const currentWord = entries[wordIndex % entries.length];
     let timeoutId;
@@ -59,5 +52,7 @@ export function useTypewriter(words, options = {}) {
     wordIndex,
   ]);
 
+  if (!entries.length) return '';
+  if (reducedMotion) return entries[wordIndex % entries.length];
   return displayText;
 }

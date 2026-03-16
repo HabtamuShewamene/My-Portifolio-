@@ -1,6 +1,6 @@
 import { env } from '../config/env.js';
 
-export function errorHandler(err, req, res, next) {
+export function errorHandler(err, req, res, _next) {
   const status = err.statusCode || 500;
   if (env.nodeEnv !== 'test') {
     console.error('[API ERROR]', err);

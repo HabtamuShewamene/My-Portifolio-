@@ -1,0 +1,12 @@
+
+> portfolio-backend@1.0.0 start
+> node server.js
+
+Email transporter initialized
+JSON store initialized
+Port 5000 is in use. Trying 5001...
+Port 5001 is in use. Trying 5002...
+Server listening on http://localhost:5002
+CORS enabled for: http://localhost:5173, http://localhost:5174, http://localhost:3000, http://127.0.0.1:5173, http://127.0.0.1:5174, http://127.0.0.1:3000, http://[::1]:5173, http://[::1]:5174, http://[::1]:3000
+CORS test endpoint: http://localhost:5002/api/test
+^C^C
