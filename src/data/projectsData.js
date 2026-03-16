@@ -284,7 +284,7 @@ export const projects = [
     complexity: 3,
     difficulty: 3,
     screenshot:
-      'https://images.unsplash.com/photo-1517142089942-ba376ce32a0f?auto=format&fit=crop&w=1200&q=80',
+      '/bug-tracker.jpg',
     features: [
       { title: 'Issue Lifecycle', icon: 'LC', detail: 'Open, in-progress, and resolved flow.' },
       { title: 'Severity Tracking', icon: 'SV', detail: 'Prioritize bugs by impact and urgency.' },
