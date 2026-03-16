@@ -108,9 +108,10 @@ export default function ProjectCard({
               const image = event.currentTarget;
               if (image.dataset.fallbackApplied === 'true') return;
               image.dataset.fallbackApplied = 'true';
-              // Use a conceptually appropriate fallback for Bug Tracking System
               if (project.id === 'bug-tracker') {
                 image.src = '/bug tracking.png';
+              } else if (project.id === 'task-management') {
+                image.src = '/task management.png';
               } else {
                 image.src = '/admin.jpg';
               }

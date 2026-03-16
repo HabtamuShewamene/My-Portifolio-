@@ -33,6 +33,8 @@ function normalizeProject(project, index) {
         ? '/admin.jpg'
         : project.id === 'bug-tracker'
           ? '/bug tracking.png'
+        : project.id === 'task-management'
+          ? '/task management.png'
         : project.screenshot ||
           `https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80`,
     architecture:

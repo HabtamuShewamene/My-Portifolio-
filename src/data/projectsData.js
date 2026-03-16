@@ -233,7 +233,7 @@ export const projects = [
     complexity: 3,
     difficulty: 3,
     screenshot:
-      'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1200&q=80',
+      '/task management.png',
     features: [
       { title: 'Kanban Workflow', icon: 'KB', detail: 'Drag tasks between progress states.' },
       { title: 'Labels & Dates', icon: 'LD', detail: 'Prioritize tasks with visual markers.' },
