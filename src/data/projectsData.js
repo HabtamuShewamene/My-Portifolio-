@@ -284,7 +284,7 @@ export const projects = [
     complexity: 3,
     difficulty: 3,
     screenshot:
-      '/bug-tracker.jpg',
+      '/bug tracking.png',
     features: [
       { title: 'Issue Lifecycle', icon: 'LC', detail: 'Open, in-progress, and resolved flow.' },
       { title: 'Severity Tracking', icon: 'SV', detail: 'Prioritize bugs by impact and urgency.' },
@@ -323,6 +323,34 @@ export const projects = [
       { label: 'Resolved Bug Rate', value: 72 },
     ],
   },
+    {
+      id: 'crime-scene-management',
+      title: 'Crime Scene Management System',
+      description: 'A full-stack web application for investigation teams to manage crime scene evidence, investigation tasks, and records efficiently. Centralized, structured, and secure data management for investigators.',
+      techStack: ['Next.js', 'Tailwind CSS', 'PHP', 'Laravel', 'PostgreSQL'],
+      github: 'https://github.com/your-username/crime-scene-management',
+      demo: '',
+      category: 'Full Stack',
+      date: '2026-03-16',
+      complexity: 4,
+      difficulty: 4,
+      screenshot: '',
+      features: [
+        { title: 'Evidence & Records', icon: 'ER', detail: 'Manage crime scene evidence and investigation records.' },
+        { title: 'Task Workflow', icon: 'TW', detail: 'Organize investigation tasks and workflows.' },
+        { title: 'Secure Data', icon: 'SD', detail: 'Secure storage and retrieval of investigation data.' },
+        { title: 'Modern UI', icon: 'UI', detail: 'Responsive and modern user interface.' },
+        { title: 'PostgreSQL DB', icon: 'DB', detail: 'Structured database management using PostgreSQL.' },
+      ],
+      challenges: [],
+      architecture: [
+        { name: 'Frontend', role: 'Next.js + Tailwind CSS' },
+        { name: 'Backend', role: 'PHP (Laravel)' },
+        { name: 'Database', role: 'PostgreSQL' },
+      ],
+      codeSnippets: [],
+      metrics: [],
+    },
   {
     id: 'job-portal',
     title: 'Job Portal System (Java Full Stack)',
